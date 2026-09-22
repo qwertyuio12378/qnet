@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>QNET</title>
+<style>
+:root{--blue:#00b0f0;--bg:#f5f7fa;--line:#ececec;--txt:#333;--sub:#999;--ph:#c8c8c8}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;font-size:14px;overflow:hidden}
+.page{position:absolute;top:0;left:0;right:0;bottom:80px;overflow-y:auto;display:none;pointer-events:none}
+.page.active{display:block;pointer-events:auto}
+.hd{background:#00CCFF;color:#fff;height:48px;padding:0 16px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:10;font-size:17px;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.hd .left{position:absolute;left:12px;font-size:20px}
+.hd .right{position:absolute;right:14px;font-size:15px;font-weight:400}
+.search{margin:10px 12px;background:#fff;border-radius:20px;padding:9px 14px;display:flex;align-items:center;gap:8px;border:1px solid #e8e8e8}
+.search input{border:none;outline:none;flex:1;font-size:13px;background:transparent;color:var(--txt)}
+.search .ic{color:var(--ph);font-size:14px}
+.card{background:#fff;margin:10px 12px;border-radius:12px;overflow:hidden}
+.gtitle{padding:12px 14px 6px;font-size:12px;color:var(--sub)}
+.row{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .main{flex:1;min-width:0}
+.row .t1{font-size:15px;font-weight:600}
+.row .t2{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5;word-break:break-all}
+.gridic{width:40px;height:40px;border-radius:9px;border:1.6px solid var(--blue);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;padding:7px;margin-right:12px;flex-shrink:0}
+.gridic i{background:var(--blue);border-radius:2px}
+.pill{background:var(--blue);color:#fff;border:none;border-radius:18px;padding:8px 22px;font-size:14px;font-weight:600}
+.pill:active{opacity:.85}
+.pill.gray{background:#e5e5e5;color:#999}
+.addbtn{color:var(--blue);border:none;background:#fff;border-radius:16px;padding:6px 16px;font-size:13px;flex-shrink:0}
+.addbtn.added{color:#999;border:none;background:transparent}
+.scenerow{display:flex;align-items:center;padding:14px;border-bottom:1px solid var(--line)}
+.scenerow:last-child{border-bottom:none}
+.scenerow .main{flex:1;margin-right:10px}
+.scenerow .t1{font-size:15px;font-weight:600}
+.scenerow .t2{font-size:12px;color:var(--sub);margin-top:5px;line-height:1.5}
+.tplrow{display:flex;align-items:center;padding:13px 14px}
+.tplrow:last-child{border-bottom:none}
+.tplrow .radio{width:18px;height:18px;border-radius:50%;border:2px solid #ccc;margin-right:11px;flex-shrink:0}
+.tplrow.selected{background:#e3f2fd}
+.tplrow .main{flex:1;min-width:0}
+.tplrow .t1{font-size:15px;font-weight:600}
+.tplrow .t2{font-size:12px;color:var(--sub);margin-top:4px}
+.tplrow .del{color:var(--blue);padding:4px 10px;font-size:13px;border:1px solid var(--blue);border-radius:12px;flex-shrink:0}
+.empty{text-align:center;padding:90px 0 40px}
+.empty .box{width:86px;height:70px;margin:0 auto 18px;position:relative}
+.empty .t1{color:#8a8f99;font-size:15px}
+.empty .t2{color:#b5b5b5;font-size:12px;margin-top:8px}
+.tabbar{position:fixed;bottom:14px;left:24px;right:24px;height:52px;background:#1e2235;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,0.28);display:flex;z-index:20;padding:6px;gap:4px}
+.tab{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#8a90a6;padding:0 12px;border-radius:999px;cursor:pointer;transition:all .2s}.tab .tabic{width:18px;height:18px;transition:transform .15s;color:#8a90a6}.tab.on .tabic{color:#1e2235}.tab:active .tabic{transform:scale(.85)}
+.tab.on{background:#fff;color:#1e2235;font-weight:600}
+.tab .ti{width:30px;height:30px;background-color:#999;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain}
+.tab.on .ti{background-color:var(--blue)}
+.icon-work{-webkit-mask-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAApCAYAAABz26rUAAAFNUlEQVR4nNVZXW8SXRB+ZqGltRULdNMaiqStt9xrjIk3fv3faqONFuNXTNSbGrAWS6xlZcWlZLFb9+uc94J39wXZhbMLNb5PcsIWZmfm2TMzZ2ZLnHP8nyH9CSPjHhLnfKxMGOhP74DruLAdGwAwk5xBIpmYSF9yGk6Ng+u40NoadF3H6ekpHMfpGU8msbCwgHQ6jUwmg5mZmci6z52ApmlQFAWKouDu3buB2/3gwQMqFotYWVmBLMvRDHjxdx5LVVU8ffoUXBCPHj3C169fwTkHY0zIxrk532638fjxY2Hn+9FqtYQJnEsVsm0blUoFt2/fjlUh9vb2YFmWkOzUqxDnHIqiIJ/Phyp+/vw5SZKEbreLe/fuBcodHR1RoVAAEY20l+Sc+0KMMZimCV3X4bouJEkCYywyiWq1inw+P/T9u3fvqFgs4tq1a0gmk+h0Otjb26NSqTREolqtgoj8yuS6LrLZLObm5kBEYIz1/O5PGMMw8Pbt21hxOw7lchmWZQ0lKGMML168GGtza2sLb968gWEY4Un85cuXc3Gec86bzWZgEjLG0G63he3u7+/DdV3/Xj+JOedoNpuRw0UUFy9eDP1tcXFRWI+qqiCi4SrEXIZMJjOZlyPgbX0/vL8NwxDWk8lkwP/NW876CCSSCRQKBZTL5dFpHxMHBwcwTXOABBHBcRwcHh4K6SiXy1QsFiFJku8z+dmMXs9iWiZUVfVjbFwZC8Lm5mZgafz48SNdvnzZDydd19Fut7GxsREof3BwQEQEIoIkScjlclhcXPQJAOgRAODHlXcNwN+qKOCco16vhzpVLpdpaWkJRARd13Hz5s1AuVqtRpubm+PtB1WGccurAt7n71XFsR3s7OzErmgPHz7Er1+/hHyJfRJ7uxPW37daLciyHEv58fExra2tCcnGIsAYg6b1+vtutzvQ36dSKeRyOeSyOSjfFFQqldA2OgiHh4e0sbEh7EtkAp1OB41GA41GA3fu3Ant7/P5PAqFAmzbxufPn3Hjxo2Rhl6/fk1XrlzxWxDR/BtLwK+5nEPTNHz48AG3bt0SYr2zs0OlUgnysgzlm4JWqxU4kS0vL2NlZQWpVEpE7bCDIgn748ePWIm5tbWFVqsFx3bAOYdpmjAMA4Zh+OcC7ysAIonbv4SrjkjDFYYnT57ANM2RDjLGYhEQCiFVVbG6uhoouL29Tel0GkDvYLp//37k/r7fh6jnjtA8sL+/j9XV1aGb379/T9evX8fCwgIkkqB39dD+vlKp9Awmh98jjCKQSCT8KMhms5ifnx+8rz/2oswDz549g2M7A4eZFwaThFsYfp8HPJ9jzwONRgOO7QzFLmMM379/P7e5olqt+vYmmgeWlpYgJaShbWcuQzaTFdYTFZqm+SHHJ5kHzs7O4HWK/UgkE/h5+nNK7g7j0qVL/vVE80CtVoNt2wPfcc5hWRbq9fq0/B3A7u5u9HkAAK5evRra3+fzeVyYvwAAMM4MqKoaKl+r1ShqGfUq4UTzQL1ex/r6eqBTu7u7JMsyJEnCyclJaM/z6dMnWl9fD3yBO4pAvx+cB/RHnIudeJP294ZhxDppxy3hV4ulUklUNPDeubm5gSc9LQgR4JxDlmUcHR3R9vZ2pLO+Xq/T2tparNlaCCLb5G2967o4Pj7Gq1evxobTy5cv0Wg0AsfOaa5YE5llWWg2mzg5OUGn04HrugB6fUs6nfb7+9nZ2Wk/7yFEJuCVNM7/m4lNywQApGZTE//PKyomHuo9QgAGrv8UIhPwHP9b8A87BTRFnwb0qQAAAABJRU5ErkJggg==');mask-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAApCAYAAABz26rUAAAFNUlEQVR4nNVZXW8SXRB+ZqGltRULdNMaiqStt9xrjIk3fv3faqONFuNXTNSbGrAWS6xlZcWlZLFb9+uc94J39wXZhbMLNb5PcsIWZmfm2TMzZ2ZLnHP8nyH9CSPjHhLnfKxMGOhP74DruLAdGwAwk5xBIpmYSF9yGk6Ng+u40NoadF3H6ekpHMfpGU8msbCwgHQ6jUwmg5mZmci6z52ApmlQFAWKouDu3buB2/3gwQMqFotYWVmBLMvRDHjxdx5LVVU8ffoUXBCPHj3C169fwTkHY0zIxrk532638fjxY2Hn+9FqtYQJnEsVsm0blUoFt2/fjlUh9vb2YFmWkOzUqxDnHIqiIJ/Phyp+/vw5SZKEbreLe/fuBcodHR1RoVAAEY20l+Sc+0KMMZimCV3X4bouJEkCYywyiWq1inw+P/T9u3fvqFgs4tq1a0gmk+h0Otjb26NSqTREolqtgoj8yuS6LrLZLObm5kBEYIz1/O5PGMMw8Pbt21hxOw7lchmWZQ0lKGMML168GGtza2sLb968gWEY4Un85cuXc3Gec86bzWZgEjLG0G63he3u7+/DdV3/Xj+JOedoNpuRw0UUFy9eDP1tcXFRWI+qqiCi4SrEXIZMJjOZlyPgbX0/vL8NwxDWk8lkwP/NW876CCSSCRQKBZTL5dFpHxMHBwcwTXOABBHBcRwcHh4K6SiXy1QsFiFJku8z+dmMXs9iWiZUVfVjbFwZC8Lm5mZgafz48SNdvnzZDydd19Fut7GxsREof3BwQEQEIoIkScjlclhcXPQJAOgRAODHlXcNwN+qKOCco16vhzpVLpdpaWkJRARd13Hz5s1AuVqtRpubm+PtB1WGccurAt7n71XFsR3s7OzErmgPHz7Er1+/hHyJfRJ7uxPW37daLciyHEv58fExra2tCcnGIsAYg6b1+vtutzvQ36dSKeRyOeSyOSjfFFQqldA2OgiHh4e0sbEh7EtkAp1OB41GA41GA3fu3Ant7/P5PAqFAmzbxufPn3Hjxo2Rhl6/fk1XrlzxWxDR/BtLwK+5nEPTNHz48AG3bt0SYr2zs0OlUgnysgzlm4JWqxU4kS0vL2NlZQWpVEpE7bCDIgn748ePWIm5tbWFVqsFx3bAOYdpmjAMA4Zh+OcC7ysAIonbv4SrjkjDFYYnT57ANM2RDjLGYhEQCiFVVbG6uhoouL29Tel0GkDvYLp//37k/r7fh6jnjtA8sL+/j9XV1aGb379/T9evX8fCwgIkkqB39dD+vlKp9Awmh98jjCKQSCT8KMhms5ifnx+8rz/2oswDz549g2M7A4eZFwaThFsYfp8HPJ9jzwONRgOO7QzFLmMM379/P7e5olqt+vYmmgeWlpYgJaShbWcuQzaTFdYTFZqm+SHHJ5kHzs7O4HWK/UgkE/h5+nNK7g7j0qVL/vVE80CtVoNt2wPfcc5hWRbq9fq0/B3A7u5u9HkAAK5evRra3+fzeVyYvwAAMM4MqKoaKl+r1ShqGfUq4UTzQL1ex/r6eqBTu7u7JMsyJEnCyclJaM/z6dMnWl9fD3yBO4pAvx+cB/RHnIudeJP294ZhxDppxy3hV4ulUklUNPDeubm5gSc9LQgR4JxDlmUcHR3R9vZ2pLO+Xq/T2tparNlaCCLb5G2967o4Pj7Gq1evxobTy5cv0Wg0AsfOaa5YE5llWWg2mzg5OUGn04HrugB6fUs6nfb7+9nZ2Wk/7yFEJuCVNM7/m4lNywQApGZTE//PKyomHuo9QgAGrv8UIhPwHP9b8A87BTRFnwb0qQAAAABJRU5ErkJggg==')}
+.icon-scene{-webkit-mask-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAjCAYAAADSQImyAAAHrklEQVR4nLVYW08TXRd+9p7pFNtCOz0IkYCJdlpqAwLhBokK/ADjb/QneC+xFYkXiIktpUyJxgtNT9OBlxcROjPru+i3tx0OQsF33ZBhpuu8nnVgRIS/RQcHBxSNRlmz2STP88A5h+M4UBQFjDFomgbXdZFIJNjfkqn+LUaNRoOq1SoYY2SaJk5PT8E5BwAEAgGhOBRFQTqdpomJCUSj0Vsbwm4bgUajQTs7O6jVagAAwc/zPOl5IgJjDJ7n9YQyhtHRUTx8+BDj4+OIxWI3NuTGBliWRdvb29jd3QVjPfmO40gDGGMyApxzeJ4HkVb9f5PJJHK5HPL5/I2MuJEB5XKZ9vb2UK/XoSgKiEh6nHOOoaEhBAIBeK4HNdDL0pOTE7iui5OTExmRftnZbBbPnz8f2IiBDSiVSvThw4dzCgxHhuF6Lh48eABd1wEAqqoiGo2CiGBZFjqdDjqdDo7+PcI/h/8AgIwSAKTTaSwvLw9kxEAG1Go1evPmDYBeriuKAsdxENfjeDz7GIqiIJPJXKmAaZr0+fNn2LYto6eqKhzHQT6fx9OnT69txEAoVCqVAPS8JiKQTCYxNzcHwzCuLTSTybB4PE7r6+s4ODjA6emprItqtQoiomfPnl2LH7/6kx69ffuWms0mVFWV+B6Px7G6ujqQ8oKSySR7+fIlMwwDmqaBcy7rqVKpXJvPtQz49u0bCZj0PA/dbhdEhNnZWSSTyVth+ZMnT9j4+DiICEQE13XBOce7d++uldt/NKDRaFCxWKSvX78CgK+jqqqKSqWCt2/fUrVavVUzmZubQzgclrUgUuk6dGER1+t12t3dhWmaPlwXOK9pmg+BiAhTU1PI5/M3HhNM06S1tTWZSq7rYmpqCul0GqFQ6NJmd86AQqFAlUoFiqLIwhIkcl8gkGhgRATOOVKpFJaWlm6cVq9evaJfv371FOvjHY/HL212vhQqFotkmqZPedH+R4ZHEAqFMDIygmQyiUgkAlVV4bquFNhqtVAsFm+iOwBgbGxMNkPBFwA6nQ7ev3+P7e3tc+kiI1AsFqXnheWe52F4eBiRSAS5XE4yvXv3LjqdDtrtNr58+YLj42NfShmGMXBDAoCtrS3a3NwEAOk4EWnxnMvlfH1CBQDbtml3d1cychwHqqri3r17yOVyF8JkIpGAYRhIJBK0ubmJo6OjnkcYg2maWF5eHlR/aJomU0dQMBiUfYKIUC6X4bouCQdxACgUCgB6Yy8RIRAIIBaL4cWLF+wqjM9kMiybzUoYFJH48ePHwMgUj8cB/K4pzjkmJyfBOYeqqlBVFYFAwIdQvF6vU71eBwB0u10wxhAJR7C6unptwcFgEN1uF67rykFNpOJtyTAMZLNZaZjjOOCco1AoEADw/f19ORoImp2bHQgONU1DIBDw8XAc50YKCwcIXpqmYWlpiYVCIdnkRJoCAK9UKnJWVxQFwWAQU1NTAxVgqVTyKa9pGoaGhgZWXkBoP7KlUikGAAsLCxIdRaS3traI27Yt4ZIxhlgsdqUg27Zpf3+fGo0GFQoFsiwLwO/R+P79+zdqaJ8+fZJ8iAihUEi+y2QyLBQK+Rrr8fEx1G63K/G82+0iEAhcKkBsYe12G67rwrZtGW7BOBwOI5/PD6q74O97jkajvudYLIafP39Kee12uwej4nIAQMLhRbSxsYF6vS57hPA4Ywyu62JkZASzs7My7IOQaZrUvz8TESKRiO8bkUKqqsppgMeiMVkYjDG02+1LhUQiEZ8Agc2e50HXdSwsLODRo0c3GiPK5bJ0JBEhGAyei+TR0ZF8L/TlaSMN4HfhcM6xubl5IYZPT09D13Xouo54PI5YNIbR0VGMjY1hfn7+WtvYRVSpVMiyLOlhAJicnPRFstFo0P7+vvyNiJAajUblj0R1X5ZGyWSSrayskJh7OOc3VlpQuVym9fV1mcLdbhfhcBgzMzO+7yzLkj1AFHk6nYZqGAbb2tqig4MDAL08M00TnufRysrKOeXEpJlIJG6jNwCg2WzSxsaGTGHXdRGJRMSIImXbtk3ValXu4ABw586d3iYHAPPz8zKFxDhQq9Vkt/svqFwu0+vXr31yFUXBxMQEFhcXfY5bW1tDp9MBADmtptNppFIppgKAYRjs4+ZHOvz3UDYk13Xx/wGPZmZmoOv6X7lntlot2t7eRq1WA2NMzl+u6yKVSmF6evrctwJexbEsFApJI+U4XavV6OPmR+wf7PsEqqoKXdeRy+WQTCbP9Ymze4NAiP4L3OnpKSzLgmVZKJfLkm//QSwYDGJxcRHJZBKO46BSqWBnZ0eijuu6YIxhZGQECwsLsvZ8G1m1WqVSqdRrEH3LSj+NjY0NZIA4avU3O5HvgjjnvpqyLEtuf/08dV3H/Py8b7w/t1I2m015r+l2u9IDlx3ALjoTnu3OZ6l/QbnsPdBLY1G4ekzH49nHyOVyvlS+cKlvtVq0t7eH79+/4/DwUI7ZYhrsp7MRAPyHr7MLylkDzhrSPxkLxcORMLLZ7IWQ/cfTooCvVquFbrcLx3HOpdVlEeCMw6OLvcwZh+v9njgv4hcMBqFpGgzD+ON0fO3bqG3b5DgObNv2/f+qCFwotK8GLoooAOi6jtHR0SuR739Ejodel+9jUwAAAABJRU5ErkJggg==');mask-image:url('data:image/png;base64,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')}
+.icon-set{-webkit-mask-image:url('data:image/png;base64,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');mask-image:url('data:image/png;base64,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')}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;z-index:99;display:none;max-width:82%;text-align:center}
+.sw{position:relative;width:46px;height:26px;background:#ddd;border-radius:13px;transition:.2s;flex-shrink:0}
+.sw.on{background:var(--blue)}
+.sw .k{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on .k{left:22px}
+.editor{position:fixed;inset:0;background:#fff;z-index:60;display:none;flex-direction:column}
+.editor.show{display:flex}
+.editor .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding-bottom:40px}
+.fcard{background:#fff;margin:10px 12px;border-radius:12px;padding:4px 14px 8px}
+.ftag{display:inline-block;background:var(--blue);color:#fff;font-size:12px;border-radius:12px;padding:4px 12px;margin:10px 0 4px}
+.frow{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);gap:8px}
+.frow:last-child{border-bottom:none}
+.frow .lb{width:44px;flex-shrink:0;font-size:14px}
+.frow .cell{flex:1;display:flex;align-items:center;gap:6px;min-width:0}
+.frow .cell .cl{font-size:12px;color:var(--sub);flex-shrink:0}
+.frow input{flex:1;min-width:0;border:none;outline:none;text-align:right;font-size:14px;color:var(--txt);background:transparent}
+.frow input::placeholder{color:var(--ph);font-size:13px}
+.frow .unit{font-size:12px;color:var(--sub);flex-shrink:0}
+.sel{flex:1;text-align:right;font-size:14px;color:var(--txt);display:flex;justify-content:flex-end;align-items:center;gap:4px}
+.sel::after{content:"∨";color:#aaa;font-size:11px}
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none;align-items:center;justify-content:center}
+.mask.show{display:flex}
+.dlg{background:#fff;border-radius:14px;width:82%;max-height:72%;overflow-y:auto;padding:20px 18px}
+.dlg h3{font-size:16px;margin-bottom:12px;text-align:center}
+.dlg p{font-size:13px;color:#555;line-height:1.8;margin-bottom:8px}
+.dlg .btns{display:flex;gap:10px;margin-top:14px}
+.dlg .btns button{flex:1;padding:10px;border-radius:8px;border:none;font-size:14px}
+.dlg .bok{background:var(--blue);color:#fff}
+.dlg .bno{background:#f0f0f0;color:#666}
+.runbar{margin:10px 12px;background:#e8f7ff;border:1px solid #b3e5fc;border-radius:12px;padding:11px 14px;font-size:13px;color:#0277bd;display:none}
+.userbar{display:flex;align-items:center;gap:14px;padding:14px;background:#fff;margin:10px 12px;border-radius:12px}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:13px;color:#666;margin-bottom:6px}
+.login-field input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;outline:none}
+.login-field input:focus{border-color:var(--blue)}
+.pwd-boxes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;justify-items:center;margin-top:4px;max-width:240px;margin-left:auto;margin-right:auto}
+.pwd-box{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;border:2px solid #ddd;border-radius:10px;text-align:center;font-size:18px;font-weight:bold;outline:none;transition:all .2s;background:#fafafa;color:#333!important;padding:0!important;box-sizing:border-box!important;-webkit-text-security:disc!important}
+.pwd-box:focus{border-color:var(--blue);background:#fff;transform:scale(1.05)}
+.pwd-box.correct{border-color:#4CAF50;background:#E8F5E9;color:#2E7D32}
+.pwd-box.wrong{border-color:#f44336;background:#FFEBEE;color:#C62828;animation:shake .3s}
+.pwd-box.verifying{border-color:#2196F3;background:#E3F2FD;animation:pulse .3s infinite;transform:scale(1.1);box-shadow:0 0 10px rgba(33,150,243,0.5)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.ban-btn{padding:12px;border:none;border-radius:8px;background:var(--blue);color:#fff;font-size:14px;width:100%}
+.arrow{color:#ccc;font-size:22px;flex-shrink:0}
+.avatar{width:50px;height:50px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;overflow:hidden;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.userinfo{flex:1;min-width:0}
+.uname{font-size:16px;font-weight:600;color:var(--txt)}
+.udesc{font-size:12px;color:var(--sub);margin-top:2px}
+@keyframes pageIn{0%{opacity:0;transform:translateX(18px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.qxet-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+.qxet-label{font-size:14px;color:#333;flex-shrink:0}
+.qxet-input{border:none;outline:none;text-align:right;font-size:14px;color:#666;background:transparent;flex:1;margin-left:12px}
+.qxet-input-wrap{display:flex;align-items:center;flex:1;justify-content:flex-end}
+.qxet-unit{font-size:12px;color:#999;margin-left:4px;flex-shrink:0}
+.qxet-divider{height:1px;background:#f0f0f0;margin-left:16px}
+.qxet-section{padding:10px 16px 6px;font-size:12px;color:#999;background:#fafafa}
+
+/* ===== 新工作台样式 ===== */
+:root { --primary: #00CCFF; --primary-dark: #00A8DD; --bg: #F5F5FA; --card: #FFFFFF; --text-main: #333333; --text-sub: #999999; --border: #EEEEEE; --section-bg: #F0F0F7; --success: #7CCD3E; --danger: #FF3B30; }
+.search-bar { padding: 10px 16px; background: #fff; }
+.search-input { width: 100%; height: 36px; background: var(--bg); border-radius: 18px; display: flex; align-items: center; padding: 0 14px; gap: 8px; color: var(--text-sub); transition: background 0.2s; cursor: pointer; }
+.search-input:active { background: #e0e0e6; }
+.search-input svg { width: 16px; height: 16px; fill: var(--text-sub); flex-shrink: 0; }
+.app-select { background: #fff; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.app-info { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
+.app-info:active .app-icon { transform: scale(0.92); }
+.app-icon { width: 40px; height: 40px; border-radius: 8px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s; }
+.app-icon img { width: 100%; height: 100%; object-fit: cover; }
+.app-icon svg { width: 24px; height: 24px; fill: #999; }
+.app-text { flex: 1; min-width: 0; }
+.app-name { font-size: 15px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-desc { font-size: 12px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.start-btn { background: var(--primary); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; flex-shrink: 0; margin-left: 12px; }
+.start-btn:active { transform: scale(0.92); opacity: 0.8; }
+.start-btn.running { background: var(--danger); }
+.scene-list { margin-top: 10px; background: #fff; overflow: hidden; }
+.scene-item-wrapper { position: relative; overflow: hidden; }
+.scene-item-wrapper { animation: listSlide 0.3s ease both; }
+.scene-item-wrapper:nth-child(1) { animation-delay: 0.02s; }
+.scene-item-wrapper:nth-child(2) { animation-delay: 0.04s; }
+.scene-item-wrapper:nth-child(3) { animation-delay: 0.06s; }
+.scene-item-wrapper:nth-child(4) { animation-delay: 0.08s; }
+.scene-item-wrapper:nth-child(5) { animation-delay: 0.10s; }
+.scene-item-wrapper:nth-child(6) { animation-delay: 0.12s; }
+.scene-item-wrapper:nth-child(7) { animation-delay: 0.14s; }
+.scene-item-wrapper:nth-child(8) { animation-delay: 0.16s; }
+.scene-item { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; position: relative; background: #fff; transition: transform 0.2s ease, background 0.15s; z-index: 2; }
+.scene-item:active { background: #f5f9ff; }
+.scene-item:last-child { border-bottom: none; }
+.scene-item.active { background: #E8F8FF; }
+.scene-name { font-size: 16px; margin-bottom: 4px; }
+.scene-desc { font-size: 12px; color: var(--text-sub); }
+.scene-action { color: var(--text-sub); font-size: 13px; display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 12px; transition: color 0.2s; }
+.scene-action:active { color: var(--primary); }
+.delete-btn { position: absolute; right: 0; top: 0; bottom: 0; width: 80px; background: var(--danger); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer; z-index: 1; transition: opacity 0.2s; }
+.delete-btn:active { opacity: 0.7; }
+.empty-state { padding: 60px 20px; text-align: center; color: var(--text-sub); font-size: 14px; }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+/* === new editor style === */
+.mod-title{background:transparent;padding:12px 16px 4px}
+.mod-tag{display:inline-block;background:#00CCFF;color:#fff;padding:4px 10px;border-radius:4px;font-size:13px}
+.mod-section{background:#fff;margin:0 12px 10px;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.mod-row{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0}
+.mod-row:last-child{border-bottom:none}
+.mod-label{color:#333;font-size:14px;font-weight:500;width:56px;flex-shrink:0}
+.mod-input{border:none;outline:none;font-size:14px;color:#333;background:transparent;text-align:right;flex:1}
+.mod-unit{color:#999;font-size:12px;margin-left:4px;flex-shrink:0}
+.multi-field{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:2px}
+.multi-field .sub-label{color:#999;font-size:12px;margin:0 2px 0 8px;white-space:nowrap}
+.multi-field .f-input{width:52px;text-align:right;border:none;outline:none;font-size:14px;color:#333;background:transparent}
+.multi-field .f-input::placeholder{color:#ccc}
+.mod-input::placeholder{color:#ccc}
+
+
+@keyframes rowIn{0%{opacity:0;transform:translateX(-10px)}100%{opacity:1;transform:translateX(0)}}
+.scenerow,.tplrow,.scene-item-wrapper{animation:rowIn .3s ease both}
+.scenerow:nth-child(1),.tplrow:nth-child(1),.scene-item-wrapper:nth-child(1){animation-delay:.02s}
+.scenerow:nth-child(2),.tplrow:nth-child(2),.scene-item-wrapper:nth-child(2){animation-delay:.05s}
+.scenerow:nth-child(3),.tplrow:nth-child(3),.scene-item-wrapper:nth-child(3){animation-delay:.08s}
+.scenerow:nth-child(4),.tplrow:nth-child(4),.scene-item-wrapper:nth-child(4){animation-delay:.11s}
+.scenerow:nth-child(5),.tplrow:nth-child(5),.scene-item-wrapper:nth-child(5){animation-delay:.14s}
+.scenerow:nth-child(6),.tplrow:nth-child(6),.scene-item-wrapper:nth-child(6){animation-delay:.17s}
+.scenerow:nth-child(7),.tplrow:nth-child(7),.scene-item-wrapper:nth-child(7){animation-delay:.20s}
+.scenerow:nth-child(8),.tplrow:nth-child(8),.scene-item-wrapper:nth-child(8){animation-delay:.23s}
+.scenerow:nth-child(n+9),.tplrow:nth-child(n+9),.scene-item-wrapper:nth-child(n+9){animation-delay:.26s}
+</style>
+</head>
+<body>
+
+<script>
+function haptic(){ try{ if(navigator.vibrate) navigator.vibrate(8); }catch(e){} }
+document.addEventListener('click',function(e){
+  var t=e.target;
+  while(t&&t!==document.body){
+    if(t.onclick||(t.getAttribute&&(t.getAttribute('onclick')||t.tagName==='BUTTON'||t.tagName==='A'))){ haptic(); break; }
+    if(t.classList&&(t.classList.contains('row')||t.classList.contains('tab')||t.classList.contains('scene-item')||t.classList.contains('mod-row')||t.classList.contains('setting-item'))){ haptic(); break; }
+    t=t.parentNode;
+  }
+},true);
+</script>
+
+
+<!-- 工作台 -->
+<div class="page active" id="page-work">
+    <div class="hd">QXET<div class="right" onclick="openEditor()">新增</div></div>
+    <div class="search-bar">
+      <div class="search-input" onclick="document.getElementById('kw').focus()">
+        <svg viewbox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-sub);flex-shrink:0;">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input id="kw" placeholder="搜索场景或参数..." oninput="renderWork()" style="border:none;outline:none;background:transparent;flex:1;font-size:14px;color:var(--text-main);min-width:0;">
+      </div>
+    </div>
+    <div class="runbar" id="runbar"></div>
+    <div class="app-select">
+      <div class="app-info" onclick="chooseApp()">
+        <img class="app-icon" id="appIcon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACE0lEQVRo3u2Xv4sTURDHP/P2EmMQBW1PiCgqCIe1ldETQe6uMh5iH1CxtjDFgT8qwcIqzf0BV5oDFfGagxOsrrARzkJip2lEXc9N3li4ByEk2Wx2s+bgfWFZeDM7M9+38903Cw4ODg4AlbWKN6rvylolH8d/GEwaQWqNS1uni62d+2/mj0QW/+rq0aDY+njmYGtzaggAKkop97vzOMqxHQTPRSkBfhqJZ9IIYuGegfcgtx+sl0VUzgEngWOhSwv4BHwFrgN+B3t3agjkrf0eeKYpSklU7vRxmQ0vAET1szdjgqloodp6ealtzHbYFiP2m5ylw3btxeWFpPklmXjnL4J9DeTDpa3wfmHAI732XRG58nDh7WbmBFYai8U2Pz6AnNhb+2N3D3udQt7L6bd+z/SzK+z88v25Zzfe+ZlqoM3PW93FA+Sk8FRy9sCgfelnFzh1qFi4CaxmSkBhubdMEa0Oe6mD7KqyPC4Bk6D35lI8yM+7WWa/IvIrVGuUr4HUAaxSfbK08TKcfzTNQh4tbsiwfAk0IPW9k9SI1jPY01j5RhHxbFfw4xl0Rax8Zr9rwBFwBBwBR8ARmDiBL12DbzODmmLliyRgleq/QNrEmOqkq4+bb+xfykkNc04D4/VqUoyvLZO8V1MoPoG2JK097NVEb09H2d054Ag4Av+fQNQIMJGRJDUCUSNA1iOJg4ODQzb4C7qsvM/BXeT2AAAAAElFTkSuQmCC" style="width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+        <div class="app-text">
+          <div class="app-name" id="appName">未选择</div>
+          <div class="app-desc" id="appSub">点击选择应用</div>
+        </div>
+      </div>
+      <button class="start-btn" id="mainBtn" onclick="event.stopPropagation();onMainBtn()">启动NEXT</button>
+    </div>
+    <div class="scene-list" id="tplList"></div>
+    <div class="empty" id="emptyTip" style="display:none;text-align:center;padding:60px 0 40px;color:var(--text-sub);">
+      <div style="font-size:40px;margin-bottom:12px;">📭</div>
+      <div style="font-size:15px;color:var(--text-main);margin-bottom:4px;">暂无场景配置</div>
+      <div style="font-size:12px;">点击右上角"新增"配置场景</div>
+    </div>
+  </div>
+
+<!-- 设置 -->
+<div class="page" id="page-set">
+  <div class="hd">设置</div>
+  <div class="userbar">
+    <div class="avatar" id="userAvatar" onclick="onAvatarClick()">
+      <img id="avatarImg" style="display:none">
+      <span id="avatarDef">👤</span>
+    </div>
+    <div class="userinfo" onclick="onNameClick()">
+      <div class="uname" id="userName">点击登录</div>
+      <div class="udesc" id="userDesc">未登录</div>
+    </div>
+  </div>
+  <div id="userSection" style="display:none">
+    <div class="gtitle">账号</div>
+    <div class="card">
+      <div class="row" onclick="editName()">
+        <div class="main"><div class="t1">修改昵称</div></div>
+        <div class="arrow">›</div>
+      </div>
+      <div class="row" onclick="pickAvatar()">
+        <div class="main"><div class="t1">修改头像</div></div>
+        <div class="arrow">›</div>
+      </div>
+    </div>
+  </div>
+  <div class="gtitle">功能设置</div>
+  <div class="card">
+    <div class="row">
+      <div class="main"><div class="t1">测试报告</div><div class="t2">html和csv文件格式保存，下次启动生效<br>文件路径：/storage/emulated/0/qnet_save/report</div></div>
+      <div class="sw" id="sw_report" onclick="toggleOpt('report')"><div class="k"></div></div>
+    </div>
+    <div class="row">
+      <div class="main"><div class="t1">网络抓包</div><div class="t2">pcap文件格式保存，下次启动生效<br>文件路径：/storage/emulated/0/qnet_save/pcap</div></div>
+      <div class="sw" id="sw_pcap" onclick="toggleOpt('pcap')"><div class="k"></div></div>
+    </div>
+  </div>
+  <div class="gtitle">悬浮窗设置</div>
+  <div class="card">
+    <div class="row">
+      <div class="main"><div class="t1">控制悬浮窗</div><div class="t2">显示/切换弱网模板</div></div>
+      <div class="sw" id="sw_cfw" onclick="toggleOpt('cfw')"><div class="k"></div></div>
+    </div>
+    <div class="row">
+      <div class="main"><div class="t1">信息悬浮窗</div><div class="t2">弱网参数显示</div></div>
+      <div class="sw" id="sw_ifw" onclick="toggleOpt('ifw')"><div class="k"></div></div>
+    </div>
+    <div class="row">
+      <div class="main"><div class="t1">防封禁</div><div class="t2">启用防封禁机制</div></div>
+      <div class="sw" id="sw_anti" onclick="toggleOpt('anti')"><div class="k"></div></div>
+    </div>
+  </div>
+  <div class="gtitle">账号</div>
+  <div class="card">
+    <div class="row" onclick="logout()">
+      <div class="main"><div class="t1" style="color:#f44336">退出登录</div><div class="t2">返回QQ登录页</div></div>
+      <div class="arrow">›</div>
+    </div>
+  </div>
+  <div class="gtitle">关于</div>
+  <div class="card">
+    <div class="row" onclick="showToast('当前版本已经是最新')">
+      <div class="main"><div class="t1">版本更新</div></div>
+      <div style="color:var(--sub);font-size:13px">当前版本已经是最新</div>
+    </div>
+    <div class="card" style="margin:10px 12px">
+      <div class="gtitle" style="padding:12px 14px 8px">关于</div>
+      <div style="padding:0 14px 12px;font-size:13px;color:#666;line-height:1.8">
+        <div style="margin-bottom:8px;color:#999">提醒：近期发现外网有用户利用QNET进行违反软件规则的行为。QNET旨在为用户提供一款网络模拟的测试类工具，杜绝一切利用QNET在外网应用中的非法行为。</div>
+        <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">版本：</span>V8.9.27</div>
+        <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">作者：</span>梦的开始·博哥</div>
+        <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">反馈QQ群：</span>1036856569</div>
+        <div id="aboutVerInline" style="color:#999;font-size:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <div class="tab on" id="tab-work" onclick="switchTab('work')"><svg class="tabic" width="24" height="24" viewBox="0 0 24 24" fill="none"><line x1="3" y1="8" x2="11.7" y2="8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="15" cy="8" r="3.3" stroke="currentColor" stroke-width="2.2" fill="none"/><line x1="18.3" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="12.3" y1="16" x2="21" y2="16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="16" r="3.3" stroke="currentColor" stroke-width="2.2" fill="none"/><line x1="3" y1="16" x2="5.7" y2="16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>工作台</span></div>
+  <div class="tab" id="tab-set" onclick="switchTab('set')"><svg class="tabic" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L21 7v10l-9 5-9-5V7l9-5z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="#fff"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg><span>设置</span></div>
+</div>
+
+<!-- 编辑模板 -->
+<div class="editor" id="editor">
+  <div class="hd"><span class="left" onclick="closeEditor()">‹</span><span id="edTitle">编辑模板</span><span class="right" onclick="saveEditor()">保存</span></div>
+  <div class="body">
+    <div style="padding:16px">
+      <button onclick="deleteCurrentTpl()" id="delBtnBottom" style="width:100%;padding:12px;border:1px solid #eee;border-radius:6px;background:#fafafa;color:#f44336;font-size:14px">删除模板</button>
+    </div>
+    <div class="mod-row" style="background:#fff;margin:12px 12px 0;border-radius:10px;overflow:hidden">
+      <span class="mod-label" style="width:auto">模板名称</span>
+      <input type="text" id="e_name" placeholder="未命名" style="flex:1;text-align:right;border:none;outline:none;font-size:15px">
+    </div>
+    <div class="mod-row" style="background:#fff;margin:0 12px;border-radius:0 0 10px 10px;border-top:1px solid #f0f0f0">
+      <span class="mod-label" style="width:auto">模板介绍</span>
+      <input type="text" id="e_desc" placeholder="输入模板介绍（选填）" style="flex:1;text-align:right;border:none;outline:none;font-size:14px;color:#666">
+    </div>
+
+    <div class="mod-title"><span class="mod-tag">网络带宽</span></div>
+    <div class="mod-section">
+      <div class="mod-row"><span class="mod-label">上行</span><input class="mod-input" type="number" id="e_ob" placeholder="默认为空不生效"><span class="mod-unit">kbps</span></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span><input class="mod-input" type="number" id="e_ib" placeholder="默认为空不生效"><span class="mod-unit">kbps</span></div>
+    </div>
+
+    <div class="mod-title"><span class="mod-tag">网络延时</span></div>
+    <div class="mod-section">
+      <div class="mod-row"><span class="mod-label">上行</span><input class="mod-input" type="number" id="e_od" placeholder="默认为空不生效"><span class="mod-unit">ms</span></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span><input class="mod-input" type="number" id="e_id" placeholder="默认为空不生效"><span class="mod-unit">ms</span></div>
+    </div>
+
+    <div class="mod-title"><span class="mod-tag">随机抖动与丢包</span></div>
+    <div class="mod-section">
+      <div class="mod-row"><span class="mod-label">上行</span>
+        <div class="multi-field">
+          <span class="sub-label">抖动最大</span><input class="f-input" type="number" id="e_odj" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">丢包率</span><input class="f-input" type="number" id="e_ol" placeholder="-1"><span class="mod-unit">%</span>
+        </div>
+      </div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span>
+        <div class="multi-field">
+          <span class="sub-label">抖动最大</span><input class="f-input" type="number" id="e_idj" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">丢包率</span><input class="f-input" type="number" id="e_il" placeholder="-1"><span class="mod-unit">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mod-title"><span class="mod-tag">周期丢包</span></div>
+    <div class="mod-section">
+      <div class="mod-row"><span class="mod-label">上行</span>
+        <div class="multi-field">
+          <span class="sub-label">通包时长</span><input class="f-input" type="number" id="e_opp" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">丢包时长</span><input class="f-input" type="number" id="e_opl" placeholder="0"><span class="mod-unit">ms</span>
+        </div>
+      </div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span>
+        <div class="multi-field">
+          <span class="sub-label">通包时长</span><input class="f-input" type="number" id="e_ipp" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">丢包时长</span><input class="f-input" type="number" id="e_ipl" placeholder="0"><span class="mod-unit">ms</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mod-title"><span class="mod-tag">协议与IP</span></div>
+    <div class="mod-section">
+      <div class="mod-row"><span class="mod-label">协议类型</span><div class="sel" id="protoSel" onclick="showProtoDlg()" style="font-size:14px">全部协议</div></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">IP列表</span><input class="mod-input" type="text" id="e_ip" placeholder="例如:1.1.1.1|8.8.8.8"></div>
+    </div>
+
+    <div class="mod-title"><span class="mod-tag">高级参数</span></div>
+    <div class="mod-section" style="margin-bottom:0">
+      <div class="mod-row"><span class="mod-label" style="width:56px">持续时间</span><input class="mod-input" type="number" id="e_dur" placeholder="ms，默认为空不生效"></div>
+      <div class="mod-row"><span class="mod-label" style="width:56px">循环执行</span><input class="mod-input" type="number" id="e_loop" placeholder="0/1，默认为空不生效"></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label" style="width:56px">开始时间</span><input class="mod-input" type="number" id="e_start" placeholder="ms，默认为空不生效"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 协议选择 -->
+<div class="mask" id="protoMask" onclick="if(event.target===this)this.className='mask'">
+  <div class="dlg">
+    <h3>协议类型</h3>
+    <div id="protoOpts"></div>
+  </div>
+</div>
+
+<!-- 更新日志 -->
+<div class="mask" id="aboutMask" onclick="if(event.target===this)this.className='mask'">
+  <div class="dlg">
+    <h3>更新日志</h3>
+    <p>提醒：近期发现外网有用户利用QNET进行违反软件规则的行为。QNET旨在为用户提供一款网络模拟的测试类工具，杜绝一切利用QNET在外网应用中的非法行为。</p>
+    <p>版本V8.9.27<br>作者：梦的开始·博哥；<br>反馈问题和建议请加QQ群:1036856569</p>
+    <p id="aboutVer">应用版本: 8.9.27<br>系统版本：</p>
+    <div class="btns"><button class="bok" onclick="document.getElementById('aboutMask').className='mask'">确定</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 存储封装（DOM storage 不可用时降级为内存） ===== */
+var store={
+  mem:{},
+  get:function(k){ try{ var v=localStorage.getItem(k); if(v!==null&&v!==undefined) return v; }catch(e){} return (this.mem[k]!==undefined)?this.mem[k]:null; },
+  set:function(k,v){ this.mem[k]=v; try{ localStorage.setItem(k,v); }catch(e){} }
+};
+/* ===== 预设场景（与原版一致） ===== */
+var SCENES=[
+ {name:"极差网络",desc:"低带宽，高延迟，高概率随机丢包",p:{out_delay:800,in_delay:800,out_delaybiasarray:[[0,400,100]],in_delaybiasarray:[[0,400,100]],out_loss:40,in_loss:40,out_bandwidth:64,in_bandwidth:64}},
+ {name:"连续丢包",desc:"模拟短时间内连续丢包的网络场景",p:{out_loss:1500,out_pass:1500,in_loss:1500,in_pass:1500}},
+ {name:"断线重连(短)",desc:"完全丢包7秒后恢复网络",p:{out_loss:7000,out_pass:5000,in_loss:7000,in_pass:5000}},
+ {name:"断线重连(长)",desc:"完全丢包30秒后恢复网络",p:{out_loss:30000,out_pass:5000,in_loss:30000,in_pass:5000}},
+ {name:"上下行高延时高抖动",desc:"上下行延时500ms，抖动500ms",p:{out_delay:500,in_delay:500,out_delaybiasarray:[[0,500,100]],in_delaybiasarray:[[0,500,100]]}},
+ {name:"上下行低延时",desc:"上下行延时分别为100ms",p:{out_delay:100,in_delay:100}},
+ {name:"上下行低丢包率",desc:"上下行随机丢包率分别为5%",p:{out_loss:5,in_loss:5}},
+ {name:"上下行高丢包率",desc:"上下行随机丢包率分别为30%",p:{out_loss:30,in_loss:30}}
+];
+var PROTONAMES={15:"全部协议",1:"TCP",2:"UDP",4:"DNS",8:"ICMP",3:"TCP+UDP"};
+var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb) workbench=JSON.parse(_wb)||[];}catch(e){}
+var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
+var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1;
+/* ===== 账号系统 ===== */
+/* 登录系统已彻底移除 */
+function checkLogin(){ return true; }
+function renderUser(){
+  var nameEl=document.getElementById("userName");
+  var descEl=document.getElementById("userDesc");
+  var img=document.getElementById("avatarImg");
+  var def=document.getElementById("avatarDef");
+  var userSec=document.getElementById("userSection");
+  var name="用户", avatar="";
+  try{ name=localStorage.getItem("qn_user_name")||"用户"; }catch(e){}
+  try{ avatar=localStorage.getItem("qn_user_avatar")||""; }catch(e){}
+  nameEl.textContent=name; descEl.textContent="";
+  if(avatar){ img.src=avatar; img.style.display="block"; def.style.display="none"; }
+  else { img.style.display="none"; def.style.display="block"; }
+  if(userSec) userSec.style.display="block";
+}
+function onAvatarClick(){ pickAvatar(); }
+function onNameClick(){ editName(); }
+function pickAvatar(){
+  try{ qnetAndroidObj.pickAvatar(); }catch(e){ showToast("无法打开相册"); }
+}
+function setAvatarFromBase64(data){
+  if(!data){ showToast("头像数据为空"); return; }
+  try{ localStorage.setItem("qn_user_avatar",data); }catch(e){}
+  renderUser(); showToast("头像已更新");
+}
+function customPrompt(title,defaultVal,cb){
+  var m=document.getElementById("mpMask");
+  var t=document.getElementById("mpTitle");
+  var i=document.getElementById("mpInput");
+  t.textContent=title; i.value=defaultVal||"";
+  m.style.display="flex";
+  setTimeout(function(){i.focus();},50);
+  var ok=function(){ m.style.display="none"; cb(i.value); };
+  var cancel=function(){ m.style.display="none"; cb(null); };
+  document.getElementById("mpOk").onclick=ok;
+  document.getElementById("mpCancel").onclick=cancel;
+}
+function customConfirm(msg,cb){
+  var m=document.getElementById("mpMask");
+  var t=document.getElementById("mpTitle");
+  var i=document.getElementById("mpInput");
+  t.textContent=msg; i.style.display="none";
+  m.style.display="flex";
+  var ok=function(){ m.style.display="flex"; i.style.display=""; m.style.display="none"; cb(); };
+  var cancel=function(){ i.style.display=""; m.style.display="none"; };
+  document.getElementById("mpOk").onclick=ok;
+  document.getElementById("mpCancel").onclick=cancel;
+}
+function editName(){
+  var cur="";
+  try{ cur=localStorage.getItem("qn_user_name")||""; }catch(e){}
+  customPrompt("请输入昵称",cur,function(n){
+    if(n!==null){
+      n=n.trim()||"用户";
+      try{ localStorage.setItem("qn_user_name",n); }catch(e){}
+      renderUser();
+    }
+  });
+}
+function saveWb(){ try{ store.set("qn_wb",JSON.stringify(workbench)); }catch(e){} }
+function saveOpts(){ try{ store.set("qn_opts",JSON.stringify(opts)); }catch(e){} }
+function findWb(id){ for(var i=0;i<workbench.length;i++) if(workbench[i].id===id) return i; return -1; }
+
+/* ===== bridge ===== */
+function callNative(o){ try{ qnetAndroidObj.callAndroidApi(JSON.stringify(o)); }catch(e){} }
+var _lastVol=-1;
+setInterval(function(){ try{ callNative({api:"get_current_volume"}); }catch(e){} },500);
+
+
+function fillProfile(p){
+  var o={out_delay:-1,in_delay:-1,out_delaybiasarray:[],in_delaybiasarray:[],out_loss:-1,in_loss:-1,out_bandwidth:-1,in_bandwidth:-1,out_burst:-1,in_burst:-1,out_rate:-1,in_rate:-1,out_pass:-1,in_pass:-1,protocol:15,duration:-1,ip_list:""};
+  for(var k in p) o[k]=p[k];
+  if(o.ip_list&&o.ip_list.join) o.ip_list=o.ip_list.join("|");
+  return o;
+}
+
+/* ===== 渲染 ===== */
+var _curTab="work";
+function switchTab(t){
+  _curTab=t;
+  ["work","set"].forEach(function(x){
+    document.getElementById("page-"+x).className="page"+(x===t?" active":"");
+    document.getElementById("tab-"+x).className="tab"+(x===t?" on":"");
+  });
+}
+function handleBack(){
+  var ed=document.getElementById("editor");
+  if(ed && ed.className.indexOf("show")>=0){ closeEditor(); return; }
+  if(_curTab!=="work"){ switchTab("work"); return; }
+  try{ qnetAndroidObj.callAndroidApi(JSON.stringify({api:"exit_app"})); }catch(e){}
+}
+function renderScenes(){
+  var el=document.getElementById("sceneList");
+  if(!el) return;
+  var html="";
+  for(var i=0;i<SCENES.length;i++){
+    var s=SCENES[i],added=!!hasScene(s.name);
+    html+='<div class="scenerow"><div class="main"><div class="t1">'+s.name+'</div><div class="t2">推荐理由：'+s.desc+'</div></div>'
+      +'<button class="addbtn'+(added?' added':'')+'" onclick="addScene('+i+',this)">'+(added?'已添加':'添加')+'</button></div>';
+  }
+  el.innerHTML=html;
+}
+function hasScene(name){ for(var i=0;i<workbench.length;i++) if(workbench[i].name===name) return workbench[i]; return null; }
+function addScene(i){
+  var s=SCENES[i];
+  if(hasScene(s.name)){ showToast("已在工作台"); return; }
+  workbench.push({id:"s_"+Date.now()+i,name:s.name,desc:"推荐理由："+s.desc,p:JSON.parse(JSON.stringify(s.p)),scene:1});
+  saveWb(); renderScenes(); renderWork(); syncProfilesToNative();
+}
+function renderWork(){
+  var kw=(document.getElementById("kw").value||"").trim();
+  var html="";
+  for(var i=0;i<workbench.length;i++){
+    var t=workbench[i];
+    if(kw && t.name.indexOf(kw)<0 && (t.desc||"").indexOf(kw)<0) continue;
+    html+='<div class="scene-item-wrapper"><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')">'
+      +'<div><div class="scene-name">'+t.name+'</div>'+(t.desc?'<div class="scene-desc">'+t.desc+'</div>':'')+'</div>'
+      +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">编辑 <span>›</span></div></div></div>';
+  }
+  document.getElementById("tplList").innerHTML=html;
+  document.getElementById("emptyTip").style.display=(workbench.length===0)?"block":"none";
+}
+function selectTpl(id){ selectedId=id;
+  document.querySelectorAll("#tplList .scene-item").forEach(function(el){ el.classList.remove("active"); });
+  event && event.currentTarget && event.currentTarget.classList.add("active");
+  if(running){ var i=findWb(id); if(i>=0){ applyTplToNative(workbench[i]); setRunning(true); } }
+}
+function delTpl(i){
+  var t=workbench[i];
+  if(t.id===selectedId) selectedId=null;
+  workbench.splice(i,1); saveWb(); renderWork(); renderScenes(); syncProfilesToNative();
+}
+function syncProfilesToNative(){
+  var list=[];
+  for(var i=0;i<workbench.length;i++){
+    list.push({profile_id:workbench[i].id,name:workbench[i].name});
+  }
+  callNative({api:"get_user_profiles",user_profiles:list});
+}
+function findOpenTpl(){
+  for(var i=0;i<workbench.length;i++) if(workbench[i].name.indexOf("开")>=0) return workbench[i];
+  return workbench[0]||null;
+}
+function findCloseTpl(){
+  for(var i=0;i<workbench.length;i++) if(workbench[i].name.indexOf("关")>=0) return workbench[i];
+  return workbench[1]||null;
+}
+function applyTplToNative(t){
+  if(!t) return;
+  var prof=fillProfile(t.p);
+  callNative({api:"update_qnet",profile:{profile_id:t.id,name:t.name,desc:t.desc||"",type:2,params:[prof]}});
+}
+function switchByVolumeKey(type){
+  return;
+  if(!checkLogin()) return;
+  var t;
+  if(type==="up"){
+    t=findOpenTpl();
+    if(!t){
+      var idx=findWb(selectedId);
+      idx=(idx+1)%workbench.length;
+      t=workbench[idx];
+    }
+    if(!t) return;
+    selectedId=t.id;
+    renderWork();
+    if(!running){
+      var prof=fillProfile(t.p);
+      var msg={api:"start_qnet",profile:{profile_id:t.id,name:t.name,desc:t.desc||"",type:2,params:[prof]},dump_pcap:opts.pcap};
+      if(currentPkg) msg.package_name=currentPkg;
+      callNative(msg);
+    } else {
+      applyTplToNative(t);
+    }
+
+  } else {
+    t=findCloseTpl();
+    if(!t){
+      var idx=findWb(selectedId);
+      idx=(idx-1+workbench.length)%workbench.length;
+      t=workbench[idx];
+    }
+    if(!t) return;
+    
+    selectedId=t.id;
+    renderWork();
+    if(running){ applyTplToNative(t); }
+  }
+}
+
+/* ===== 选择应用 ===== */
+function chooseApp(){ if(!checkLogin()) return; callNative({api:"set_package_name"}); }
+
+/* ===== 启停 ===== */
+function doStart(){
+  if(!currentPkg){ showToast("请先选择测试应用"); return; }
+  var i=findWb(selectedId);
+  if(i<0){ showToast("请先添加并选择场景"); return; }
+  var t=workbench[i];
+  var prof=fillProfile(t.p);
+  callNative({api:"set_qnet_option",dump_pcap:opts.pcap,dump_report:opts.report,control_fw:opts.cfw,info_fw:opts.ifw,editorStyle:opts.editorStyle});
+  var msg={api:"start_qnet",profile:{profile_id:t.id,name:t.name,desc:t.desc||"",type:2,params:[prof]},dump_pcap:opts.pcap};
+  if(currentPkg) msg.package_name=currentPkg;
+  callNative(msg);
+}
+function onMainBtn(){ if(!checkLogin()) return;
+  if(running){ callNative({api:"stop_qnet"}); }
+  else{
+    if(!checkLogin()) return;
+    if(!selectedId){ if(workbench.length===1){selectedId=workbench[0].id;renderWork();} else { showToast("请先选择场景"); return; } }
+    doStart();
+  }
+}
+function setRunning(on){
+  running=on;
+  var b=document.getElementById("mainBtn");
+  b.textContent=on?"关闭NEXT":"启动NEXT";
+  b.className="pill"+(on?" gray":"");
+  var rb=document.getElementById("runbar");
+  if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
+  else rb.style.display="none";
+}
+
+/* ===== 设置 ===== */
+function toggleEditorStyle(){
+  if(opts.editorStyle==='2.1.5'){ opts.editorStyle='1.2'; document.getElementById('editorStyleText').textContent='当前：1.2风格'; }
+  else{ opts.editorStyle='2.1.5'; document.getElementById('editorStyleText').textContent='当前：2.1.5风格'; }
+  try{ localStorage.setItem('qn_opts', JSON.stringify(opts)); }catch(e){}
+  try{ callNative({api:"set_qnet_option",editorStyle:opts.editorStyle}); }catch(e){}
+  showToast('已切换为'+opts.editorStyle+'风格');
+}
+function toggleOpt(k){
+  opts[k]=opts[k]?0:1; saveOpts();
+  document.getElementById("sw_"+k).className="sw"+(opts[k]?" on":"");
+  refreshSw();
+  callNative({api:"set_qnet_option",dump_pcap:opts.pcap,dump_report:opts.report,control_fw:opts.cfw,info_fw:opts.ifw,editorStyle:opts.editorStyle});
+}
+function refreshSw(){ ["pcap","report","cfw","ifw","anti"].forEach(function(k){ document.getElementById("sw_"+k).className="sw"+(opts[k]?" on":""); }); }
+function showAbout(){
+  var av=document.getElementById("aboutVer");
+  av.innerHTML="应用版本: 8.9.27(80927)<br>系统版本："+(window._osver||"");
+  document.getElementById("aboutMask").className="mask show";
+}
+
+/* ===== 编辑器 ===== */
+function openEditor(idx){
+  editingIdx=idx; editProto=15;
+  var t=(idx!=null&&workbench[idx])?workbench[idx]:null;
+  document.getElementById("edTitle").textContent=t?"编辑模板":"新增模板";
+  var p=t?t.p:{};
+  document.getElementById("e_name").value=t?(t.name==="未命名"?"":t.name):"";
+  document.getElementById("e_desc").value=t&&t.desc&&t.desc.indexOf("推荐理由")!==0?t.desc:"";
+  setV("e_ob",p.out_bandwidth); setV("e_ib",p.in_bandwidth);
+  setV("e_od",p.out_delay); setV("e_id",p.in_delay);
+  setV("e_odj",biasMax(p.out_delaybiasarray)); setV("e_idj",biasMax(p.in_delaybiasarray));
+  var cycO=isCyclic(p.out_loss,p.out_pass), cycI=isCyclic(p.in_loss,p.in_pass);
+  setV("e_ol",cycO?-1:p.out_loss); setV("e_il",cycI?-1:p.in_loss);
+  setV("e_opp",cycO?p.out_pass:-1); setV("e_ipp",cycI?p.in_pass:-1);
+  setV("e_opl",cycO?p.out_loss:-1); setV("e_ipl",cycI?p.in_loss:-1);
+  setV("e_ip",(p.ip_list&&p.ip_list.join)?p.ip_list.join("|"):"");
+  setV("e_dur",p.duration>0?p.duration:"");
+  setV("e_loop",""); setV("e_start","");
+  editProto=p.protocol||15;
+  document.getElementById("protoSel").firstChild.textContent=PROTONAMES[editProto]||"全部协议";
+  try{ document.getElementById("delBtnBottom").style.display=(editingIdx!=null&&workbench[editingIdx])?"block":"none"; }catch(e){}
+  try{ document.getElementById("delBtn12").style.display=(editingIdx!=null&&workbench[editingIdx])?"flex":"none"; }catch(e){}
+  document.getElementById("editor").className="editor show";
+}
+function setV(id,v){ var el=document.getElementById(id); el.value=(v===undefined||v===null||v===-1||v==="")?"":v; }
+function biasMax(a){ if(a&&a.length&&a[0]&&a[0].length>=2&&a[0][1]>0) return a[0][1]; return ""; }
+function isCyclic(loss,pass){ return (pass!==undefined&&pass!==null); }
+function closeEditor(){ document.getElementById("editor").className="editor"; }
+function gv(id,def){ var v=document.getElementById(id).value.trim(); if(v==="")return def; return parseInt(v); }
+function showProtoDlg(){
+  var html="";
+  for(var k in PROTONAMES){
+    html+='<div class="row" style="padding:12px 6px" onclick="pickProto('+k+')"><div class="main"><div class="t1" style="font-weight:400">'+PROTONAMES[k]+'</div></div>'+(editProto===parseInt(k)?'<span style="color:var(--blue)">✓</span>':'')+'</div>';
+  }
+  document.getElementById("protoOpts").innerHTML=html;
+  document.getElementById("protoMask").className="mask show";
+}
+function pickProto(k){
+  editProto=k;
+  document.getElementById("protoSel").firstChild.textContent=PROTONAMES[k];
+  document.getElementById("protoMask").className="mask";
+}
+function saveEditor(){
+  var name=document.getElementById("e_name").value.trim()||"未命名";
+  var desc=document.getElementById("e_desc").value.trim();
+  // 修复：先复制原来的p对象，避免丢失未修改的参数
+  var p={};
+  if(editingIdx!=null&&workbench[editingIdx]){
+    var oldP=workbench[editingIdx].p||{};
+    for(var k in oldP) p[k]=oldP[k];
+  }
+  var ob=gv("e_ob",-1),ib=gv("e_ib",-1); if(ob>=0)p.out_bandwidth=ob; if(ib>=0)p.in_bandwidth=ib;
+  var od=gv("e_od",-1),idd=gv("e_id",-1); if(od>=0)p.out_delay=od; if(idd>=0)p.in_delay=idd;
+  var odj=gv("e_odj",0),idj=gv("e_idj",0);
+  if(odj>0)p.out_delaybiasarray=[[0,odj,100]];
+  if(idj>0)p.in_delaybiasarray=[[0,idj,100]];
+  var ol=gv("e_ol",-1),il=gv("e_il",-1);
+  var opp=gv("e_opp",-1),ipl_=gv("e_ipp",-1),opl=gv("e_opl",-1),ipl2=gv("e_ipl",-1);
+  if(opl>=0||opp>=0){
+    p.out_loss=(opl>=0?opl:-1);
+    p.out_pass=(opp>=0?opp:0);
+  }
+  else if(ol>=0){ p.out_loss=ol; delete p.out_pass; } else { p.out_loss=-1; delete p.out_pass; }
+  if(ipl2>=0||ipl_>=0){
+    p.in_loss=(ipl2>=0?ipl2:-1);
+    p.in_pass=(ipl_>=0?ipl_:0);
+  }
+  else if(il>=0){ p.in_loss=il; delete p.in_pass; } else { p.in_loss=-1; delete p.in_pass; }
+  p.protocol=editProto;
+  var ip=document.getElementById("e_ip").value.trim();
+  if(ip) p.ip_list=ip.split("|").map(function(x){return x.trim();}).filter(Boolean);
+  var dur=gv("e_dur",-1); if(dur>0)p.duration=dur;
+  if(editingIdx!=null&&workbench[editingIdx]){
+    var t=workbench[editingIdx]; t.name=name; if(desc)t.desc=desc; t.p=p;
+  } else {
+    workbench.push({id:"c_"+Date.now(),name:name,desc:desc||"",p:p});
+  }
+  saveWb(); renderWork(); syncProfilesToNative(); closeEditor(); showToast("已保存");
+}
+function deleteCurrentTpl(){
+  if(editingIdx==null||!workbench[editingIdx]) return;
+  var t=workbench[editingIdx];
+  customConfirm("确定删除模板「"+t.name+"」？",function(){
+    if(t.id===selectedId) selectedId=null;
+    workbench.splice(editingIdx,1);
+    editingIdx=null;
+    saveWb(); renderWork(); renderScenes(); syncProfilesToNative(); closeEditor();
+  });
+}
+
+/* ===== native -> js ===== */
+function qnetAndroidCallApi(json){
+  try{
+    if(!json)return;
+    switch(json.api){
+      case "test_callback":
+        try{ document.title="TEST_OK"; }catch(e){}
+        break;
+      case "fw_oncreate":
+        document.title="FW_STARTED";
+        break;
+      case "fw_start":
+        document.title="FW_START_"+Date.now();
+        break;
+      case "vol_checker_started":
+        document.title="VOL_OK";
+        break;
+      case "vol_running":
+        document.title="VOL:"+json.vol;
+        break;
+      case "get_current_volume":
+        if(window._lastVol === undefined) window._lastVol = json.volume;
+        if(json.volume > window._lastVol) switchByVolumeKey("up");
+        else if(json.volume < window._lastVol) switchByVolumeKey("down");
+        window._lastVol = json.volume;
+        break;
+      case "switchByVolumeKey":
+        if(json.type) switchByVolumeKey(json.type);
+        break;
+      case "qnet_status":
+        var st=json.status;
+        var on=(st===0||st===4);
+        if(on!==running)setRunning(on);
+        if(st===4){ var rb=document.getElementById("runbar"); if(rb.style.display!=="none"){ var i=findWb(selectedId); rb.innerHTML="弱网已暂停"+(i>=0?" · "+workbench[i].name:""); } }
+        break;
+      case "update_qnet_by_qnet":
+        if(json.profile_id==="__switch__"){
+          var ot=findOpenTpl(), ct=findCloseTpl();
+          var curIsOpen=ot&&selectedId===ot.id;
+          var target=curIsOpen?ct:ot;
+          if(target){ selectedId=target.id; renderWork(); applyTplToNative(target); }
+        }else if(json.profile_id){
+          selectedId=json.profile_id;
+          renderWork();
+          var idx=findWb(selectedId);
+          if(idx>=0) applyTplToNative(workbench[idx]);
+        }
+        break;
+      case "start_qnet":
+        if(json.result===0||json.result===1){
+          setRunning(true);
+          var ot=findOpenTpl();
+          if(ot){ selectedId=ot.id; renderWork(); applyTplToNative(ot); }
+          showToast("启动QXET成功");
+        }
+        else showToast("启动失败("+json.result+")");
+        break;
+      case "stop_qnet": setRunning(false); showToast("已停止"); break;
+      case "set_package_name":
+        if(json.app_name){
+          currentPkg=json.package_name||"";
+          document.getElementById("appName").textContent=json.app_name;
+          document.getElementById("appSub").textContent=currentPkg;
+          if(json.app_icon){ 
+            var iconSrc = json.app_icon;
+            if(iconSrc.indexOf('data:') !== 0){ iconSrc = 'data:image/png;base64,' + iconSrc; }
+            document.getElementById("appIcon").src = iconSrc; 
+          }
+        }
+        break;
+      case "set_qnet_option":
+        if(json.dump_pcap!==undefined)opts.pcap=json.dump_pcap?1:0;
+        if(json.dump_report!==undefined)opts.report=json.dump_report?1:0;
+        if(json.control_fw!==undefined)opts.cfw=json.control_fw?1:0;
+        if(json.info_fw!==undefined)opts.ifw=json.info_fw?1:0;
+        refreshSw();
+        break;
+      case "get_environment":
+        if(json.os_version)window._osver=json.os_version;
+        break;
+      case "show_toast": if(json.result)showToast(json.result); break;
+    }
+  }catch(e){}
+}
+function logout(){ try{ showToast("触发退出"); qnetAndroidObj.callAndroidApi(JSON.stringify({api:"logout"})); }catch(e){ alert(e); } }
+function showToast(m){
+  try{ qnetAndroidObj.callAndroidApi(JSON.stringify({api:"show_toast",msg:m})); }catch(e){}
+}
+
+window.onload=function(){
+
+  var osv="";try{var m=navigator.userAgent.match(/Android\s+(\d+[\d.]*)/);osv=m?m[1]:"未知";}catch(e){osv="未知";}
+  try{ var avi=document.getElementById("aboutVerInline"); if(avi) avi.innerHTML="应用版本: 8.9.27(80927)<br>系统版本：Android "+osv; }catch(e){}
+  try{ var av=document.getElementById("aboutVer"); if(av) av.innerHTML="应用版本: 8.9.27<br>系统版本：Android "+osv; }catch(e){}
+  renderWork(); renderScenes(); refreshSw(); renderUser();
+  callNative({api:"set_qnet_option",dump_pcap:opts.pcap,dump_report:opts.report,control_fw:opts.cfw,info_fw:opts.ifw,editorStyle:opts.editorStyle});
+  callNative({api:"init_web_finish"});
+  setTimeout(function(){callNative({api:"qnet_status"});syncProfilesToNative();},200);
+  setInterval(function(){callNative({api:"qnet_status"});},1000);
+};
+
+// 启动音量文件观察者（应用内+后台）
+setTimeout(function(){
+  try{
+    if(window.qnetAndroidObj){
+      qnetAndroidObj.callAndroidApi(JSON.stringify({api:"start_volume_observer"}));
+    }
+  }catch(e){}
+}, 1500);
+
+var _edit12CurrentId=null;
+function edit12Param(id,title,type){
+  _edit12CurrentId=id;
+  document.getElementById('edit12Title').textContent=title;
+  var input=document.getElementById('edit12Input');
+  input.type=type||'number';
+  var val=document.getElementById(id).value;
+  input.value=val||'';
+  document.getElementById('edit12Mask').style.display='flex';
+  setTimeout(function(){ input.focus(); },100);
+}
+function closeEdit12Dlg(){
+  document.getElementById('edit12Mask').style.display='none';
+  _edit12CurrentId=null;
+}
+function confirmEdit12(){
+  if(_edit12CurrentId){
+    var val=document.getElementById('edit12Input').value;
+    document.getElementById(_edit12CurrentId).value=val;
+    // 更新显示
+    var displayEl=document.getElementById(_edit12CurrentId+'_display');
+    if(displayEl) displayEl.textContent=(val===''||val==='0')?'--':val;
+  }
+  closeEdit12Dlg();
+}
+</script>
+
+<!-- 1.2 风格参数编辑页 -->
+<!-- 1.2参数编辑弹窗 -->
+<div id="mpMask" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none;align-items:center;justify-content:center">
+<div style="background:#fff;border-radius:12px;width:80%;max-width:320px;padding:20px">
+<div style="font-size:16px;font-weight:600;margin-bottom:12px" id="mpTitle">输入</div>
+<input id="mpInput" style="width:100%;border:1px solid #ddd;border-radius:8px;padding:10px;box-sizing:border-box;font-size:14px;outline:none">
+<div style="display:flex;gap:10px;margin-top:16px">
+<button id="mpCancel" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:14px">取消</button>
+<button id="mpOk" style="flex:1;padding:10px;border:none;border-radius:8px;background:#00CCFF;color:#fff;font-size:14px">确定</button>
+</div></div></div>
+</body>
+</html>
