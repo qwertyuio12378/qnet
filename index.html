@@ -9,7 +9,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;font-size:14px;overflow:hidden}
-.page{position:absolute;top:0;left:0;right:0;bottom:80px;overflow-y:auto;display:none;pointer-events:none}
+.page{position:absolute;top:0;left:0;right:0;bottom:62px;overflow-y:auto;display:none;pointer-events:none}
 .page.active{display:block;pointer-events:auto}
 .hd{background:#00CCFF;color:#fff;height:48px;padding:0 16px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:10;font-size:17px;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
 .hd .left{position:absolute;left:12px;font-size:20px}
@@ -48,8 +48,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .empty .box{width:86px;height:70px;margin:0 auto 18px;position:relative}
 .empty .t1{color:#8a8f99;font-size:15px}
 .empty .t2{color:#b5b5b5;font-size:12px;margin-top:8px}
-.tabbar{position:fixed;bottom:14px;left:24px;right:24px;height:52px;background:#1e2235;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,0.28);display:flex;z-index:20;padding:6px;gap:4px}
-.tab{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#8a90a6;padding:0 12px;border-radius:999px;cursor:pointer;transition:all .2s}.tab .tabic{width:18px;height:18px;transition:transform .15s;color:#8a90a6}.tab.on .tabic{color:#1e2235}.tab:active .tabic{transform:scale(.85)}
+.tabbar{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);height:40px;background:#1e2235;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,0.25);display:flex;z-index:20;padding:4px;gap:3px;white-space:nowrap}
+.tab{flex:0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;font-size:12px;color:#8a90a6;padding:0 16px;border-radius:999px;cursor:pointer;transition:all .2s}.tab .tabic{width:15px;height:15px;transition:transform .15s;color:#8a90a6}.tab.on .tabic{color:#1e2235}.tab:active .tabic{transform:scale(.85)}
 .tab.on{background:#fff;color:#1e2235;font-weight:600}
 .tab .ti{width:30px;height:30px;background-color:#999;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain}
 .tab.on .ti{background-color:var(--blue)}
@@ -134,6 +134,18 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .start-btn { background: var(--primary); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; flex-shrink: 0; margin-left: 12px; }
 .start-btn:active { transform: scale(0.92); opacity: 0.8; }
 .start-btn.running { background: var(--danger); }
+.app-card{background:#fff;margin:10px 12px;border-radius:16px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.app-card-row{display:flex;align-items:center;justify-content:space-between}
+.app-card-row + .app-card-row{margin-top:14px}
+.app-icon-wrap{width:56px;height:56px;border-radius:16px;background:#e8f0ff;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer}
+.app-icon-wrap img{width:100%;height:100%;object-fit:cover}
+.service-status{background:#f0f1f5;color:#999;font-size:12px;padding:5px 16px;border-radius:999px}
+.app-info-text{cursor:pointer}
+.app-name-new{font-size:17px;font-weight:700;color:#1a1a1a}
+.app-desc-new{font-size:12px;color:#999;margin-top:2px}
+.start-btn-new{background:#3b82f6;color:#fff;border:none;border-radius:999px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer}
+.start-btn-new:active{opacity:.85}
+.start-btn-new.running{background:var(--danger)}
 .scene-list { margin-top: 10px; background: #fff; overflow: hidden; }
 .scene-item-wrapper { position: relative; overflow: hidden; }
 .scene-item-wrapper { animation: listSlide 0.3s ease both; }
@@ -204,7 +216,7 @@ document.addEventListener('click',function(e){
 
 <!-- 工作台 -->
 <div class="page active" id="page-work">
-    <div class="hd">QXET<div class="right" onclick="openEditor()">新增</div></div>
+    <div class="hd">NEXT<div class="right" onclick="openEditor()">新增</div></div>
     <div class="search-bar">
       <div class="search-input" onclick="document.getElementById('kw').focus()">
         <svg viewbox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-sub);flex-shrink:0;">
@@ -214,15 +226,21 @@ document.addEventListener('click',function(e){
       </div>
     </div>
     <div class="runbar" id="runbar"></div>
-    <div class="app-select">
-      <div class="app-info" onclick="chooseApp()">
-        <img class="app-icon" id="appIcon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACE0lEQVRo3u2Xv4sTURDHP/P2EmMQBW1PiCgqCIe1ldETQe6uMh5iH1CxtjDFgT8qwcIqzf0BV5oDFfGagxOsrrARzkJip2lEXc9N3li4ByEk2Wx2s+bgfWFZeDM7M9+38903Cw4ODg4AlbWKN6rvylolH8d/GEwaQWqNS1uni62d+2/mj0QW/+rq0aDY+njmYGtzaggAKkop97vzOMqxHQTPRSkBfhqJZ9IIYuGegfcgtx+sl0VUzgEngWOhSwv4BHwFrgN+B3t3agjkrf0eeKYpSklU7vRxmQ0vAET1szdjgqloodp6ealtzHbYFiP2m5ylw3btxeWFpPklmXjnL4J9DeTDpa3wfmHAI732XRG58nDh7WbmBFYai8U2Pz6AnNhb+2N3D3udQt7L6bd+z/SzK+z88v25Zzfe+ZlqoM3PW93FA+Sk8FRy9sCgfelnFzh1qFi4CaxmSkBhubdMEa0Oe6mD7KqyPC4Bk6D35lI8yM+7WWa/IvIrVGuUr4HUAaxSfbK08TKcfzTNQh4tbsiwfAk0IPW9k9SI1jPY01j5RhHxbFfw4xl0Rax8Zr9rwBFwBBwBR8ARmDiBL12DbzODmmLliyRgleq/QNrEmOqkq4+bb+xfykkNc04D4/VqUoyvLZO8V1MoPoG2JK097NVEb09H2d054Ag4Av+fQNQIMJGRJDUCUSNA1iOJg4ODQzb4C7qsvM/BXeT2AAAAAElFTkSuQmCC" style="width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;">
-        <div class="app-text">
-          <div class="app-name" id="appName">未选择</div>
-          <div class="app-desc" id="appSub">点击选择应用</div>
+    <div class="app-card">
+      <div class="app-card-row">
+        <div class="app-icon-wrap" onclick="chooseApp()">
+          <img id="appIcon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACE0lEQVRo3u2Xv4sTURDHP/P2EmMQBW1PiCgqCIe1ldETQe6uMh5iH1CxtjDFgT8qwcIqzf0BV5oDFfGagxOsrrARzkJip2lEXc9N3li4ByEk2Wx2s+bgfWFZeDM7M9+38903Cw4ODg4AlbWKN6rvylolH8d/GEwaQWqNS1uni62d+2/mj0QW/+rq0aDY+njmYGtzaggAKkop97vzOMqxHQTPRSkBfhqJZ9IIYuGegfcgtx+sl0VUzgEngWOhSwv4BHwFrgN+B3t3agjkrf0eeKYpSklU7vRxmQ0vAET1szdjgqloodp6ealtzHbYFiP2m5ylw3btxeWFpPklmXjnL4J9DeTDpa3wfmHAI732XRG58nDh7WbmBFYai8U2Pz6AnNhb+2N3D3udQt7L6bd+z/SzK+z88v25Zzfe+ZlqoM3PW93FA+Sk8FRy9sCgfelnFzh1qFi4CaxmSkBhubdMEa0Oe6mD7KqyPC4Bk6D35lI8yM+7WWa/IvIrVGuUr4HUAaxSfbK08TKcfzTNQh4tbsiwfAk0IPW9k9SI1jPY01j5RhHxbFfw4xl0Rax8Zr9rwBFwBBwBR8ARmDiBL12DbzODmmLliyRgleq/QNrEmOqkq4+bb+xfykkNc04D4/VqUoyvLZO8V1MoPoG2JK097NVEb09H2d054Ag4Av+fQNQIMJGRJDUCUSNA1iOJg4ODQzb4C7qsvM/BXeT2AAAAAElFTkSuQmCC" style="display:none">
+          <svg id="appPlus" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#a8c5ff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </div>
+        <div class="service-status" id="serviceStatus">服务未启动</div>
       </div>
-      <button class="start-btn" id="mainBtn" onclick="event.stopPropagation();onMainBtn()">启动NEXT</button>
+      <div class="app-card-row">
+        <div class="app-info-text" onclick="chooseApp()">
+          <div class="app-name-new" id="appName">未选择应用</div>
+          <div class="app-desc-new" id="appSub">点击配置目标APP</div>
+        </div>
+        <button class="start-btn-new" id="mainBtn" onclick="event.stopPropagation();onMainBtn()">启动NEXT</button>
+      </div>
     </div>
     <div class="scene-list" id="tplList"></div>
     <div class="empty" id="emptyTip" style="display:none;text-align:center;padding:60px 0 40px;color:var(--text-sub);">
@@ -300,7 +318,7 @@ document.addEventListener('click',function(e){
     <div class="card" style="margin:10px 12px">
       <div class="gtitle" style="padding:12px 14px 8px">关于</div>
       <div style="padding:0 14px 12px;font-size:13px;color:#666;line-height:1.8">
-        <div style="margin-bottom:8px;color:#999">提醒：近期发现外网有用户利用QNET进行违反软件规则的行为。QNET旨在为用户提供一款网络模拟的测试类工具，杜绝一切利用QNET在外网应用中的非法行为。</div>
+        <div style="margin-bottom:8px;color:#999">我们的理念：<br>1. 让科技服务于人民。<br>2. 实惠、便宜、好用。<br>3. 反馈bug会及时处理。<br>4. 反馈邮箱 qwertyuio123911@qq.com</div>
         <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">版本：</span>V8.9.27</div>
         <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">作者：</span>梦的开始·博哥</div>
         <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">反馈QQ群：</span>1036856569</div>
@@ -408,7 +426,7 @@ document.addEventListener('click',function(e){
 <div class="mask" id="aboutMask" onclick="if(event.target===this)this.className='mask'">
   <div class="dlg">
     <h3>更新日志</h3>
-    <p>提醒：近期发现外网有用户利用QNET进行违反软件规则的行为。QNET旨在为用户提供一款网络模拟的测试类工具，杜绝一切利用QNET在外网应用中的非法行为。</p>
+    <p>我们的理念：<br>1. 让科技服务于人民。<br>2. 实惠、便宜、好用。<br>3. 反馈bug会及时处理。<br>4. 反馈邮箱 qwertyuio123911@qq.com</p>
     <p>版本V8.9.27<br>作者：梦的开始·博哥；<br>反馈问题和建议请加QQ群:1036856569</p>
     <p id="aboutVer">应用版本: 8.9.27<br>系统版本：</p>
     <div class="btns"><button class="bok" onclick="document.getElementById('aboutMask').className='mask'">确定</button></div>
@@ -658,7 +676,7 @@ function setRunning(on){
   running=on;
   var b=document.getElementById("mainBtn");
   b.textContent=on?"关闭NEXT":"启动NEXT";
-  b.className="pill"+(on?" gray":"");
+  b.className="start-btn-new"+(on?" running":"");
   var rb=document.getElementById("runbar");
   if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
   else rb.style.display="none";
@@ -846,6 +864,8 @@ function qnetAndroidCallApi(json){
             var iconSrc = json.app_icon;
             if(iconSrc.indexOf('data:') !== 0){ iconSrc = 'data:image/png;base64,' + iconSrc; }
             document.getElementById("appIcon").src = iconSrc; 
+            document.getElementById("appIcon").style.display="block";
+            var pl=document.getElementById("appPlus"); if(pl) pl.style.display="none";
           }
         }
         break;
