@@ -677,6 +677,12 @@ function setRunning(on){
   var b=document.getElementById("mainBtn");
   b.textContent=on?"关闭NEXT":"启动NEXT";
   b.className="start-btn-new"+(on?" running":"");
+  var ss=document.getElementById("serviceStatus");
+  if(ss){
+    ss.textContent=on?"服务运行中":"服务未启动";
+    ss.style.background=on?"#e8f7ee":"#f0f1f5";
+    ss.style.color=on?"#34a853":"#999";
+  }
   var rb=document.getElementById("runbar");
   if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
   else rb.style.display="none";
