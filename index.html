@@ -85,6 +85,13 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .dlg .btns button{flex:1;padding:10px;border-radius:8px;border:none;font-size:14px}
 .dlg .bok{background:var(--blue);color:#fff}
 .dlg .bno{background:#f0f0f0;color:#666}
+.proto-dlg{background:#fff;border-radius:12px;width:80%;max-width:320px;overflow:hidden}
+.proto-item{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer}
+.proto-item:last-child{border-bottom:none}
+.proto-item .pt-name{font-size:17px;color:#333}
+.proto-item .pt-radio{width:22px;height:22px;border-radius:50%;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.proto-item.on .pt-radio{border-color:#ff4d8d}
+.proto-item.on .pt-radio::after{content:"";width:12px;height:12px;border-radius:50%;background:#ff4d8d}
 .runbar{margin:10px 12px;background:#e8f7ff;border:1px solid #b3e5fc;border-radius:12px;padding:11px 14px;font-size:13px;color:#0277bd;display:none}
 .userbar{display:flex;align-items:center;gap:14px;padding:14px;background:#fff;margin:10px 12px;border-radius:12px}
 .login-field{margin-bottom:14px}
@@ -397,14 +404,14 @@ document.addEventListener('click',function(e){
     <div class="mod-section">
       <div class="mod-row"><span class="mod-label">上行</span>
         <div class="multi-field">
-          <span class="sub-label">抖动</span><input class="f-input" type="number" id="e_odjit" placeholder="0"><span class="mod-unit">ms</span>
-          <span class="sub-label">概率</span><input class="f-input" type="number" id="e_odjitp" placeholder="100"><span class="mod-unit">%</span>
+          <input class="f-input" type="number" id="e_odjit" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">概率</span><input class="f-input" type="number" id="e_odjitp" placeholder="0"><span class="mod-unit">%</span>
         </div>
       </div>
       <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span>
         <div class="multi-field">
-          <span class="sub-label">抖动</span><input class="f-input" type="number" id="e_idjit" placeholder="0"><span class="mod-unit">ms</span>
-          <span class="sub-label">概率</span><input class="f-input" type="number" id="e_idjitp" placeholder="100"><span class="mod-unit">%</span>
+          <input class="f-input" type="number" id="e_idjit" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">概率</span><input class="f-input" type="number" id="e_idjitp" placeholder="0"><span class="mod-unit">%</span>
         </div>
       </div>
     </div>
@@ -426,8 +433,7 @@ document.addEventListener('click',function(e){
 
 <!-- 协议选择 -->
 <div class="mask" id="protoMask" onclick="if(event.target===this)this.className='mask'">
-  <div class="dlg">
-    <h3>协议类型</h3>
+  <div class="proto-dlg">
     <div id="protoOpts"></div>
   </div>
 </div>
@@ -461,10 +467,24 @@ var SCENES=[
  {name:"上下行高延时高抖动",desc:"上下行延时500ms，抖动500ms",p:{out_delay:500,in_delay:500,out_delaybiasarray:[[0,500,100]],in_delaybiasarray:[[0,500,100]]}},
  {name:"上下行低延时",desc:"上下行延时分别为100ms",p:{out_delay:100,in_delay:100}},
  {name:"上下行低丢包率",desc:"上下行随机丢包率分别为5%",p:{out_loss:5,in_loss:5}},
- {name:"上下行高丢包率",desc:"上下行随机丢包率分别为30%",p:{out_loss:30,in_loss:30}}
+ {name:"上下行高丢包率",desc:"上下行随机丢包率分别为30%",p:{out_loss:30,in_loss:30}},
+ {name:"2.9全局不拉回关闭",desc:"上行带宽180，上行延时13ms",p:{out_bandwidth:180,out_delay:13,in_delay:0}},
+ {name:"2.9全局不拉回开启",desc:"带宽1/5362，延时45/30，抖动115(90%)/90(85%)，周期弱网Burst",p:{out_bandwidth:1,in_bandwidth:5362,out_delay:45,in_delay:30,out_delaybiasarray:[[0,115,90]],in_delaybiasarray:[[0,90,85]],out_pass:0,out_loss:150,in_pass:1159,in_loss:0,protocol:3}}
 ];
 var PROTONAMES={15:"全部协议",1:"TCP",2:"UDP",4:"DNS",8:"ICMP",3:"TCP+UDP"};
 var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb) workbench=JSON.parse(_wb)||[];}catch(e){}
+(function(){
+  var fixed=[
+    {name:"2.9全局不拉回关闭",desc:"上行带宽180，上行延时13ms",p:{out_bandwidth:180,out_delay:13,in_delay:0}},
+    {name:"2.9全局不拉回开启",desc:"带宽1/5362，延时45/30，抖动115(90%)/90(85%)，周期弱网Burst",p:{out_bandwidth:1,in_bandwidth:5362,out_delay:45,in_delay:30,out_delaybiasarray:[[0,115,90]],in_delaybiasarray:[[0,90,85]],out_pass:0,out_loss:150,in_pass:1159,in_loss:0,protocol:3}}
+  ];
+  for(var i=0;i<fixed.length;i++){
+    var found=false;
+    for(var j=0;j<workbench.length;j++){ if(workbench[j].name===fixed[i].name){found=true;break;} }
+    if(!found){ workbench.unshift({id:"s_fixed_"+Date.now()+"_"+i,name:fixed[i].name,desc:fixed[i].desc,p:fixed[i].p,scene:1}); }
+  }
+  try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
+})();
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
 var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1;
 /* ===== 账号系统 ===== */
@@ -740,28 +760,31 @@ function openEditor(idx){
   setV("e_dur",p.duration>0?p.duration:"");
   setV("e_loop",""); setV("e_start","");
   editProto=p.protocol||15;
-  document.getElementById("protoSel").firstChild.textContent=PROTONAMES[editProto]||"全部协议";
+  var _pnames={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
+  document.getElementById("protoSel").firstChild.textContent=_pnames[editProto]||"所有协议";
   try{ document.getElementById("delBtnBottom").style.display=(editingIdx!=null&&workbench[editingIdx])?"block":"none"; }catch(e){}
   try{ document.getElementById("delBtn12").style.display=(editingIdx!=null&&workbench[editingIdx])?"flex":"none"; }catch(e){}
   document.getElementById("editor").className="editor show";
 }
 function setV(id,v){ var el=document.getElementById(id); el.value=(v===undefined||v===null||v===-1||v==="")?"":v; }
 function biasMax(a){ if(a&&a.length&&a[0]&&a[0].length>=2&&a[0][1]>0) return a[0][1]; return ""; }
-function biasProb(a){ if(a&&a.length&&a[0]&&a[0].length>=3&&a[0][2]>0) return a[0][2]; return ""; }
+function biasProb(a){ if(a&&a.length&&a[0]&&a[0].length>=3) return a[0][2]; return ""; }
 function isCyclic(loss,pass){ return (pass!==undefined&&pass!==null); }
 function closeEditor(){ document.getElementById("editor").className="editor"; }
 function gv(id,def){ var v=document.getElementById(id).value.trim(); if(v==="")return def; return parseInt(v); }
 function showProtoDlg(){
+  var list=[{k:3,n:"TCP + UDP"},{k:1,n:"仅 TCP"},{k:2,n:"仅 UDP"},{k:15,n:"所有协议"}];
   var html="";
-  for(var k in PROTONAMES){
-    html+='<div class="row" style="padding:12px 6px" onclick="pickProto('+k+')"><div class="main"><div class="t1" style="font-weight:400">'+PROTONAMES[k]+'</div></div>'+(editProto===parseInt(k)?'<span style="color:var(--blue)">✓</span>':'')+'</div>';
+  for(var i=0;i<list.length;i++){
+    html+='<div class="proto-item'+(editProto===list[i].k?' on':'')+'" onclick="pickProto('+list[i].k+')"><span class="pt-name">'+list[i].n+'</span><span class="pt-radio"></span></div>';
   }
   document.getElementById("protoOpts").innerHTML=html;
   document.getElementById("protoMask").className="mask show";
 }
 function pickProto(k){
   editProto=k;
-  document.getElementById("protoSel").firstChild.textContent=PROTONAMES[k];
+  var names={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
+  document.getElementById("protoSel").firstChild.textContent=names[k]||"所有协议";
   document.getElementById("protoMask").className="mask";
 }
 function saveEditor(){
