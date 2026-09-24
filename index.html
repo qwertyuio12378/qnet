@@ -705,41 +705,18 @@ function doStart(){
   callNative(msg);
 }
 function onMainBtn(){ if(!checkLogin()) return;
-  if(running){
-    var i=findWb(selectedId);
-    var t=i>=0?workbench[i]:null;
-    var closeId=t&&t.close_id?t.close_id:"";
-    if(closeId){
-      if(isOpenState){
-        var ci=findWb(closeId);
-        if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; updateMainBtn(); showToast("进入关闭参数"); }
-      }else{
-        applyTplToNative(t); isOpenState=true; updateMainBtn(); showToast("进入开启参数");
-      }
-    }else{
-      callNative({api:"stop_qnet"});
-    }
-  }
+  if(running){ callNative({api:"stop_qnet"}); }
   else{
+    if(!checkLogin()) return;
     if(!selectedId){ if(workbench.length===1){selectedId=workbench[0].id;renderWork();} else { showToast("请先选择场景"); return; } }
-    isOpenState=true;
     doStart();
   }
 }
-function updateMainBtn(){
-  var b=document.getElementById("mainBtn");
-  if(!running){ b.textContent="启动NEXT"; b.className="start-btn-new"; return; }
-  var i=findWb(selectedId);
-  var t=i>=0?workbench[i]:null;
-  var closeId=t&&t.close_id?t.close_id:"";
-  if(closeId){ b.textContent=isOpenState?"⏸ 关闭参数":"▶ 开启参数"; }
-  else{ b.textContent="⏸ 暂停"; }
-  b.className="start-btn-new running";
-}
 function setRunning(on){
   running=on;
-  if(on) isOpenState=true;
-  updateMainBtn();
+  var b=document.getElementById("mainBtn");
+  b.textContent=on?"关闭NEXT":"启动NEXT";
+  b.className="start-btn-new"+(on?" running":"");
   var ss=document.getElementById("serviceStatus");
   if(ss){
     ss.textContent=on?"服务运行中":"服务未启动";
@@ -931,12 +908,19 @@ function qnetAndroidCallApi(json){
         break;
       case "update_qnet_by_qnet":
         if(json.profile_id==="__switch__"){
-          var ot=findOpenTpl(), ct=findCloseTpl();
-          var curIsOpen=ot&&selectedId===ot.id;
-          var target=curIsOpen?ct:ot;
-          if(target){
-            selectedId=target.id; renderWork(); applyTplToNative(target);
-            showToast(curIsOpen?"进入关闭参数":"进入开启参数");
+          var i=findWb(selectedId);
+          var t=i>=0?workbench[i]:null;
+          var closeId=t&&t.close_id?t.close_id:"";
+          if(closeId){
+            if(isOpenState){
+              var ci=findWb(closeId);
+              if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; showToast("进入关闭参数"); }
+            }else{
+              if(t){ applyTplToNative(t); isOpenState=true; showToast("进入开启参数"); }
+            }
+          }else{
+            if(running){ callNative({api:"stop_qnet"}); showToast("已暂停"); }
+            else{ doStart(); }
           }
         }else if(json.profile_id){
           selectedId=json.profile_id;
