@@ -881,7 +881,10 @@ function qnetAndroidCallApi(json){
           var ot=findOpenTpl(), ct=findCloseTpl();
           var curIsOpen=ot&&selectedId===ot.id;
           var target=curIsOpen?ct:ot;
-          if(target){ selectedId=target.id; renderWork(); applyTplToNative(target); }
+          if(target){
+            selectedId=target.id; renderWork(); applyTplToNative(target);
+            showToast(curIsOpen?"进入关闭参数":"进入开启参数");
+          }
         }else if(json.profile_id){
           selectedId=json.profile_id;
           renderWork();
