@@ -283,17 +283,6 @@ document.addEventListener('click',function(e){
       </div>
     </div>
   </div>
-  <div class="gtitle">功能设置</div>
-  <div class="card">
-    <div class="row">
-      <div class="main"><div class="t1">测试报告</div><div class="t2">html和csv文件格式保存，下次启动生效<br>文件路径：/storage/emulated/0/qnet_save/report</div></div>
-      <div class="sw" id="sw_report" onclick="toggleOpt('report')"><div class="k"></div></div>
-    </div>
-    <div class="row">
-      <div class="main"><div class="t1">网络抓包</div><div class="t2">pcap文件格式保存，下次启动生效<br>文件路径：/storage/emulated/0/qnet_save/pcap</div></div>
-      <div class="sw" id="sw_pcap" onclick="toggleOpt('pcap')"><div class="k"></div></div>
-    </div>
-  </div>
   <div class="gtitle">悬浮窗设置</div>
   <div class="card">
     <div class="row">
@@ -734,7 +723,7 @@ function toggleOpt(k){
   refreshSw();
   callNative({api:"set_qnet_option",dump_pcap:opts.pcap,dump_report:opts.report,control_fw:opts.cfw,info_fw:opts.ifw,editorStyle:opts.editorStyle});
 }
-function refreshSw(){ ["pcap","report","cfw","ifw","anti"].forEach(function(k){ document.getElementById("sw_"+k).className="sw"+(opts[k]?" on":""); }); }
+function refreshSw(){ ["cfw","ifw","anti"].forEach(function(k){ document.getElementById("sw_"+k).className="sw"+(opts[k]?" on":""); }); }
 function showAbout(){
   var av=document.getElementById("aboutVer");
   av.innerHTML="应用版本: 8.9.27(80927)<br>系统版本："+(window._osver||"");
