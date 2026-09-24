@@ -153,7 +153,9 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .start-btn-new{background:#3b82f6;color:#fff;border:none;border-radius:999px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer}
 .start-btn-new:active{opacity:.85}
 .start-btn-new.running{background:var(--danger)}
-.app-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.app-right{display:flex;flex-direction:column;align-items:stretch;gap:8px;flex-shrink:0;min-width:96px}
+.app-right .service-status{text-align:center}
+.app-right .start-btn-new{text-align:center}
 .scene-list { margin-top: 10px; background: #fff; overflow: hidden; }
 .scene-item-wrapper { position: relative; overflow: hidden; }
 .scene-item-wrapper { animation: listSlide 0.3s ease both; }
