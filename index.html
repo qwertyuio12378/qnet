@@ -496,7 +496,7 @@ var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb) workbench=JSON.parse(_
   try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
 })();
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
-var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true;
+var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
 /* ===== 账号系统 ===== */
 /* 登录系统已彻底移除 */
 function checkLogin(){ return true; }
@@ -709,6 +709,7 @@ function onMainBtn(){ if(!checkLogin()) return;
   else{
     if(!checkLogin()) return;
     if(!selectedId){ if(workbench.length===1){selectedId=workbench[0].id;renderWork();} else { showToast("请先选择场景"); return; } }
+    isPaused=false;
     doStart();
   }
 }
@@ -919,8 +920,15 @@ function qnetAndroidCallApi(json){
               if(t){ applyTplToNative(t); isOpenState=true; showToast("进入开启参数"); }
             }
           }else{
-            if(running){ callNative({api:"stop_qnet"}); showToast("已暂停"); }
-            else{ doStart(); }
+            if(!running){ doStart(); }
+            else if(isPaused){
+              var ti=findWb(selectedId);
+              if(ti>=0){ applyTplToNative(workbench[ti]); }
+              isPaused=false; showToast("已恢复");
+            }else{
+              callNative({api:"update_qnet",profile:{profile_id:"__pause__",name:"暂停",desc:"",type:2,params:[fillProfile({})]}});
+              isPaused=true; showToast("已暂停");
+            }
           }
         }else if(json.profile_id){
           selectedId=json.profile_id;
@@ -931,7 +939,7 @@ function qnetAndroidCallApi(json){
         break;
       case "start_qnet":
         if(json.result===0||json.result===1){
-          isOpenState=true;
+          isOpenState=true; isPaused=false;
           setRunning(true);
           var ot=findOpenTpl();
           if(ot){ selectedId=ot.id; renderWork(); applyTplToNative(ot); }
