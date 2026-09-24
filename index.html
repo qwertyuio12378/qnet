@@ -926,7 +926,7 @@ function qnetAndroidCallApi(json){
               if(ti>=0){ applyTplToNative(workbench[ti]); }
               isPaused=false; showToast("已恢复");
             }else{
-              callNative({api:"update_qnet",profile:{profile_id:"__pause__",name:"暂停",desc:"",type:2,params:[fillProfile({})]}});
+              callNative({api:"update_qnet",profile:{profile_id:"__pause__",name:"未生效",desc:"",type:2,params:[fillProfile({})]}});
               isPaused=true; showToast("已暂停");
             }
           }
