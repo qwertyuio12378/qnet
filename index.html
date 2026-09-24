@@ -415,10 +415,17 @@ document.addEventListener('click',function(e){
     </div>
 
     <div class="mod-title"><span class="mod-tag">高级参数</span></div>
-    <div class="mod-section" style="margin-bottom:0">
+    <div class="mod-section">
       <div class="mod-row"><span class="mod-label" style="width:56px">持续时间</span><input class="mod-input" type="number" id="e_dur" placeholder="ms，默认为空不生效"></div>
       <div class="mod-row"><span class="mod-label" style="width:56px">循环执行</span><input class="mod-input" type="number" id="e_loop" placeholder="0/1，默认为空不生效"></div>
       <div class="mod-row" style="border-bottom:none"><span class="mod-label" style="width:56px">开始时间</span><input class="mod-input" type="number" id="e_start" placeholder="ms，默认为空不生效"></div>
+    </div>
+    <div class="mod-title"><span class="mod-tag">其他</span></div>
+    <div class="mod-section" style="margin-bottom:0">
+      <div class="mod-row" style="border-bottom:none">
+        <span class="mod-label">关闭参数</span>
+        <div class="sel" id="closeSel" onclick="showCloseDlg()">不选择</div>
+      </div>
     </div>
   </div>
 </div>
@@ -427,6 +434,15 @@ document.addEventListener('click',function(e){
 <div class="mask" id="protoMask" onclick="if(event.target===this)this.className='mask'">
   <div class="proto-dlg">
     <div id="protoOpts"></div>
+  </div>
+</div>
+
+<!-- 关闭参数选择 -->
+<div class="mask" id="closeMask" onclick="if(event.target===this)this.className='mask'">
+  <div class="dlg">
+    <h3>选择关闭参数</h3>
+    <div id="closeOpts"></div>
+    <div class="btns"><button class="bno" onclick="pickClose('')">不选择</button></div>
   </div>
 </div>
 
@@ -480,7 +496,7 @@ var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb) workbench=JSON.parse(_
   try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
 })();
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
-var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1;
+var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true;
 /* ===== 账号系统 ===== */
 /* 登录系统已彻底移除 */
 function checkLogin(){ return true; }
@@ -689,18 +705,41 @@ function doStart(){
   callNative(msg);
 }
 function onMainBtn(){ if(!checkLogin()) return;
-  if(running){ callNative({api:"stop_qnet"}); }
+  if(running){
+    var i=findWb(selectedId);
+    var t=i>=0?workbench[i]:null;
+    var closeId=t&&t.close_id?t.close_id:"";
+    if(closeId){
+      if(isOpenState){
+        var ci=findWb(closeId);
+        if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; updateMainBtn(); showToast("进入关闭参数"); }
+      }else{
+        applyTplToNative(t); isOpenState=true; updateMainBtn(); showToast("进入开启参数");
+      }
+    }else{
+      callNative({api:"stop_qnet"});
+    }
+  }
   else{
-    if(!checkLogin()) return;
     if(!selectedId){ if(workbench.length===1){selectedId=workbench[0].id;renderWork();} else { showToast("请先选择场景"); return; } }
+    isOpenState=true;
     doStart();
   }
 }
+function updateMainBtn(){
+  var b=document.getElementById("mainBtn");
+  if(!running){ b.textContent="启动NEXT"; b.className="start-btn-new"; return; }
+  var i=findWb(selectedId);
+  var t=i>=0?workbench[i]:null;
+  var closeId=t&&t.close_id?t.close_id:"";
+  if(closeId){ b.textContent=isOpenState?"⏸ 关闭参数":"▶ 开启参数"; }
+  else{ b.textContent="⏸ 暂停"; }
+  b.className="start-btn-new running";
+}
 function setRunning(on){
   running=on;
-  var b=document.getElementById("mainBtn");
-  b.textContent=on?"关闭NEXT":"启动NEXT";
-  b.className="start-btn-new"+(on?" running":"");
+  if(on) isOpenState=true;
+  updateMainBtn();
   var ss=document.getElementById("serviceStatus");
   if(ss){
     ss.textContent=on?"服务运行中":"服务未启动";
@@ -756,6 +795,10 @@ function openEditor(idx){
   editProto=p.protocol||15;
   var _pnames={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
   document.getElementById("protoSel").firstChild.textContent=_pnames[editProto]||"所有协议";
+  editingCloseId=(t&&t.close_id)?t.close_id:"";
+  var _cname="不选择";
+  if(editingCloseId){ for(var _ci=0;_ci<workbench.length;_ci++){ if(workbench[_ci].id===editingCloseId){ _cname=workbench[_ci].name; break; } } }
+  document.getElementById("closeSel").firstChild.textContent=_cname;
   try{ document.getElementById("delBtnBottom").style.display=(editingIdx!=null&&workbench[editingIdx])?"block":"none"; }catch(e){}
   try{ document.getElementById("delBtn12").style.display=(editingIdx!=null&&workbench[editingIdx])?"flex":"none"; }catch(e){}
   document.getElementById("editor").className="editor show";
@@ -780,6 +823,24 @@ function pickProto(k){
   var names={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
   document.getElementById("protoSel").firstChild.textContent=names[k]||"所有协议";
   document.getElementById("protoMask").className="mask";
+}
+function showCloseDlg(){
+  var html="";
+  for(var i=0;i<workbench.length;i++){
+    var t=workbench[i];
+    if(editingIdx!=null&&workbench[editingIdx]&&t.id===workbench[editingIdx].id) continue;
+    html+='<div class="row" style="padding:12px 6px" onclick="pickClose(\''+t.id+'\')"><div class="main"><div class="t1" style="font-weight:400">'+t.name+'</div></div>'+(editingCloseId===t.id?'<span style="color:var(--blue)">✓</span>':'')+'</div>';
+  }
+  if(!html) html='<p style="text-align:center;color:#999;padding:20px">工作台暂无其他模板</p>';
+  document.getElementById("closeOpts").innerHTML=html;
+  document.getElementById("closeMask").className="mask show";
+}
+function pickClose(id){
+  editingCloseId=id||"";
+  var name="不选择";
+  if(id){ for(var i=0;i<workbench.length;i++){ if(workbench[i].id===id){ name=workbench[i].name; break; } } }
+  document.getElementById("closeSel").firstChild.textContent=name;
+  document.getElementById("closeMask").className="mask";
 }
 function saveEditor(){
   var name=document.getElementById("e_name").value.trim()||"未命名";
@@ -816,9 +877,9 @@ function saveEditor(){
   if(ip) p.ip_list=ip.split("|").map(function(x){return x.trim();}).filter(Boolean);
   var dur=gv("e_dur",-1); if(dur>0)p.duration=dur;
   if(editingIdx!=null&&workbench[editingIdx]){
-    var t=workbench[editingIdx]; t.name=name; if(desc)t.desc=desc; t.p=p;
+    var t=workbench[editingIdx]; t.name=name; if(desc)t.desc=desc; t.p=p; t.close_id=editingCloseId;
   } else {
-    workbench.push({id:"c_"+Date.now(),name:name,desc:desc||"",p:p});
+    workbench.push({id:"c_"+Date.now(),name:name,desc:desc||"",p:p,close_id:editingCloseId});
   }
   saveWb(); renderWork(); syncProfilesToNative(); closeEditor(); showToast("已保存");
 }
@@ -886,6 +947,7 @@ function qnetAndroidCallApi(json){
         break;
       case "start_qnet":
         if(json.result===0||json.result===1){
+          isOpenState=true;
           setRunning(true);
           var ot=findOpenTpl();
           if(ot){ selectedId=ot.id; renderWork(); applyTplToNative(ot); }
