@@ -395,8 +395,18 @@ document.addEventListener('click',function(e){
 
     <div class="mod-title"><span class="mod-tag">延时抖动</span></div>
     <div class="mod-section">
-      <div class="mod-row"><span class="mod-label">上行</span><input class="mod-input" type="number" id="e_odjit" placeholder="默认为空不生效"><span class="mod-unit">ms</span></div>
-      <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span><input class="mod-input" type="number" id="e_idjit" placeholder="默认为空不生效"><span class="mod-unit">ms</span></div>
+      <div class="mod-row"><span class="mod-label">上行</span>
+        <div class="multi-field">
+          <span class="sub-label">抖动</span><input class="f-input" type="number" id="e_odjit" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">概率</span><input class="f-input" type="number" id="e_odjitp" placeholder="100"><span class="mod-unit">%</span>
+        </div>
+      </div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span>
+        <div class="multi-field">
+          <span class="sub-label">抖动</span><input class="f-input" type="number" id="e_idjit" placeholder="0"><span class="mod-unit">ms</span>
+          <span class="sub-label">概率</span><input class="f-input" type="number" id="e_idjitp" placeholder="100"><span class="mod-unit">%</span>
+        </div>
+      </div>
     </div>
 
     <div class="mod-title"><span class="mod-tag">协议与IP</span></div>
@@ -721,6 +731,7 @@ function openEditor(idx){
   setV("e_od",p.out_delay); setV("e_id",p.in_delay);
   setV("e_odj",biasMax(p.out_delaybiasarray)); setV("e_idj",biasMax(p.in_delaybiasarray));
   setV("e_odjit",biasMax(p.out_delaybiasarray)); setV("e_idjit",biasMax(p.in_delaybiasarray));
+  setV("e_odjitp",biasProb(p.out_delaybiasarray)); setV("e_idjitp",biasProb(p.in_delaybiasarray));
   var cycO=isCyclic(p.out_loss,p.out_pass), cycI=isCyclic(p.in_loss,p.in_pass);
   setV("e_ol",cycO?-1:p.out_loss); setV("e_il",cycI?-1:p.in_loss);
   setV("e_opp",cycO?p.out_pass:-1); setV("e_ipp",cycI?p.in_pass:-1);
@@ -736,6 +747,7 @@ function openEditor(idx){
 }
 function setV(id,v){ var el=document.getElementById(id); el.value=(v===undefined||v===null||v===-1||v==="")?"":v; }
 function biasMax(a){ if(a&&a.length&&a[0]&&a[0].length>=2&&a[0][1]>0) return a[0][1]; return ""; }
+function biasProb(a){ if(a&&a.length&&a[0]&&a[0].length>=3&&a[0][2]>0) return a[0][2]; return ""; }
 function isCyclic(loss,pass){ return (pass!==undefined&&pass!==null); }
 function closeEditor(){ document.getElementById("editor").className="editor"; }
 function gv(id,def){ var v=document.getElementById(id).value.trim(); if(v==="")return def; return parseInt(v); }
@@ -767,8 +779,9 @@ function saveEditor(){
   if(odj>0)p.out_delaybiasarray=[[0,odj,100]];
   if(idj>0)p.in_delaybiasarray=[[0,idj,100]];
   var odjit=gv("e_odjit",0),idjit=gv("e_idjit",0);
-  if(odjit>0)p.out_delaybiasarray=[[0,odjit,100]];
-  if(idjit>0)p.in_delaybiasarray=[[0,idjit,100]];
+  var odjitp=gv("e_odjitp",100),idjitp=gv("e_idjitp",100);
+  if(odjit>0)p.out_delaybiasarray=[[0,odjit,odjitp]];
+  if(idjit>0)p.in_delaybiasarray=[[0,idjit,idjitp]];
   var ol=gv("e_ol",-1),il=gv("e_il",-1);
   var opp=gv("e_opp",-1),ipl_=gv("e_ipp",-1),opl=gv("e_opl",-1),ipl2=gv("e_ipl",-1);
   if(opl>=0||opp>=0){
