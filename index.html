@@ -408,10 +408,9 @@ document.addEventListener('click',function(e){
       </div>
     </div>
 
-    <div class="mod-title"><span class="mod-tag">协议与IP</span></div>
+    <div class="mod-title"><span class="mod-tag">协议设置</span></div>
     <div class="mod-section">
-      <div class="mod-row"><span class="mod-label">协议类型</span><div class="sel" id="protoSel" onclick="showProtoDlg()" style="font-size:14px">全部协议</div></div>
-      <div class="mod-row" style="border-bottom:none"><span class="mod-label">IP列表</span><input class="mod-input" type="text" id="e_ip" placeholder="例如:1.1.1.1|8.8.8.8"></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">协议类型</span><div class="sel" id="protoSel" onclick="showProtoDlg()" style="font-size:14px">全部协议</div></div>
     </div>
 
     <div class="mod-title"><span class="mod-tag">其他</span></div>
@@ -761,7 +760,6 @@ function openEditor(idx){
   setV("e_ol",cycO?-1:p.out_loss); setV("e_il",cycI?-1:p.in_loss);
   setV("e_opp",cycO?p.out_pass:-1); setV("e_ipp",cycI?p.in_pass:-1);
   setV("e_opl",cycO?p.out_loss:-1); setV("e_ipl",cycI?p.in_loss:-1);
-  setV("e_ip",(p.ip_list&&p.ip_list.join)?p.ip_list.join("|"):"");
   editProto=p.protocol||15;
   var _pnames={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
   document.getElementById("protoSel").firstChild.textContent=_pnames[editProto]||"所有协议";
@@ -843,8 +841,6 @@ function saveEditor(){
   }
   else if(il>=0){ p.in_loss=il; delete p.in_pass; } else { p.in_loss=-1; delete p.in_pass; }
   p.protocol=editProto;
-  var ip=document.getElementById("e_ip").value.trim();
-  if(ip) p.ip_list=ip.split("|").map(function(x){return x.trim();}).filter(Boolean);
   if(editingIdx!=null&&workbench[editingIdx]){
     var t=workbench[editingIdx]; t.name=name; if(desc)t.desc=desc; t.p=p; t.close_id=editingCloseId;
   } else {
