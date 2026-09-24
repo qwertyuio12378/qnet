@@ -927,8 +927,10 @@ function qnetAndroidCallApi(json){
               isPaused=false; showToast("已恢复");
             }else{
               var _pi=findWb(selectedId);
-              var _pp=_pi>=0?workbench[_pi].p:{};
-              callNative({api:"update_qnet",profile:{profile_id:"__pause__",name:"未生效",desc:"",type:2,params:[fillProfile(_pp)]}});
+              var _pt=_pi>=0?workbench[_pi]:null;
+              if(_pt){
+                callNative({api:"update_qnet",profile:{profile_id:_pt.id,name:_pt.name,desc:_pt.desc||"",type:2,params:[fillProfile(_pt.p)],status:"未生效"}});
+              }
               isPaused=true; showToast("已暂停");
             }
           }
