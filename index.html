@@ -414,12 +414,6 @@ document.addEventListener('click',function(e){
       <div class="mod-row" style="border-bottom:none"><span class="mod-label">IP列表</span><input class="mod-input" type="text" id="e_ip" placeholder="例如:1.1.1.1|8.8.8.8"></div>
     </div>
 
-    <div class="mod-title"><span class="mod-tag">高级参数</span></div>
-    <div class="mod-section">
-      <div class="mod-row"><span class="mod-label" style="width:56px">持续时间</span><input class="mod-input" type="number" id="e_dur" placeholder="ms，默认为空不生效"></div>
-      <div class="mod-row"><span class="mod-label" style="width:56px">循环执行</span><input class="mod-input" type="number" id="e_loop" placeholder="0/1，默认为空不生效"></div>
-      <div class="mod-row" style="border-bottom:none"><span class="mod-label" style="width:56px">开始时间</span><input class="mod-input" type="number" id="e_start" placeholder="ms，默认为空不生效"></div>
-    </div>
     <div class="mod-title"><span class="mod-tag">其他</span></div>
     <div class="mod-section" style="margin-bottom:0">
       <div class="mod-row" style="border-bottom:none">
@@ -768,8 +762,6 @@ function openEditor(idx){
   setV("e_opp",cycO?p.out_pass:-1); setV("e_ipp",cycI?p.in_pass:-1);
   setV("e_opl",cycO?p.out_loss:-1); setV("e_ipl",cycI?p.in_loss:-1);
   setV("e_ip",(p.ip_list&&p.ip_list.join)?p.ip_list.join("|"):"");
-  setV("e_dur",p.duration>0?p.duration:"");
-  setV("e_loop",""); setV("e_start","");
   editProto=p.protocol||15;
   var _pnames={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
   document.getElementById("protoSel").firstChild.textContent=_pnames[editProto]||"所有协议";
@@ -853,7 +845,6 @@ function saveEditor(){
   p.protocol=editProto;
   var ip=document.getElementById("e_ip").value.trim();
   if(ip) p.ip_list=ip.split("|").map(function(x){return x.trim();}).filter(Boolean);
-  var dur=gv("e_dur",-1); if(dur>0)p.duration=dur;
   if(editingIdx!=null&&workbench[editingIdx]){
     var t=workbench[editingIdx]; t.name=name; if(desc)t.desc=desc; t.p=p; t.close_id=editingCloseId;
   } else {
