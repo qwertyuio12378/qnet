@@ -76,6 +76,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .frow .unit{font-size:12px;color:var(--sub);flex-shrink:0}
 .sel{flex:1;text-align:right;font-size:14px;color:var(--txt);display:flex;justify-content:flex-end;align-items:center;gap:4px}
 .sel::after{content:"∨";color:#aaa;font-size:11px}
+.sel-native{flex:1;text-align:right;font-size:14px;color:var(--txt);background:transparent;border:none;outline:none;direction:rtl;-webkit-appearance:none;appearance:none}
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;display:none;align-items:center;justify-content:center}
 .mask.show{display:flex}
 .dlg{background:#fff;border-radius:14px;width:82%;max-height:72%;overflow-y:auto;padding:20px 18px}
@@ -413,7 +414,7 @@ document.addEventListener('click',function(e){
 
     <div class="mod-title"><span class="mod-tag">协议设置</span></div>
     <div class="mod-section">
-      <div class="mod-row" style="border-bottom:none"><span class="mod-label">协议类型</span><div class="sel" id="protoSel" onclick="showProtoDlg()" style="font-size:14px">全部协议</div></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">协议类型</span><select class="sel-native" id="protoSel" style="font-size:14px"><option value="15">所有协议</option><option value="3">TCP + UDP</option><option value="1">仅 TCP</option><option value="2">仅 UDP</option></select></div>
     </div>
 
     <div class="mod-title"><span class="mod-tag">其他</span></div>
@@ -423,13 +424,6 @@ document.addEventListener('click',function(e){
         <div class="sel" id="closeSel" onclick="showCloseDlg()">不选择</div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- 协议选择 -->
-<div class="mask" id="protoMask" onclick="if(event.target===this)this.className='mask'">
-  <div class="proto-dlg">
-    <div id="protoOpts"></div>
   </div>
 </div>
 
@@ -773,8 +767,7 @@ function openEditor(idx){
   setV("e_opp",cycO?p.out_pass:-1); setV("e_ipp",cycI?p.in_pass:-1);
   setV("e_opl",cycO?p.out_loss:-1); setV("e_ipl",cycI?p.in_loss:-1);
   editProto=p.protocol||15;
-  var _pnames={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
-  document.getElementById("protoSel").firstChild.textContent=_pnames[editProto]||"所有协议";
+  document.getElementById("protoSel").value=editProto;
   editingCloseId=(t&&t.close_id)?t.close_id:"";
   var _cname="不选择";
   if(editingCloseId){ for(var _ci=0;_ci<workbench.length;_ci++){ if(workbench[_ci].id===editingCloseId){ _cname=workbench[_ci].name; break; } } }
@@ -789,21 +782,6 @@ function biasProb(a){ if(a&&a.length&&a[0]&&a[0].length>=3) return a[0][2]; retu
 function isCyclic(loss,pass){ return (pass!==undefined&&pass!==null); }
 function closeEditor(){ document.getElementById("editor").className="editor"; }
 function gv(id,def){ var v=document.getElementById(id).value.trim(); if(v==="")return def; return parseInt(v); }
-function showProtoDlg(){
-  var list=[{k:3,n:"TCP + UDP"},{k:1,n:"仅 TCP"},{k:2,n:"仅 UDP"},{k:15,n:"所有协议"}];
-  var html="";
-  for(var i=0;i<list.length;i++){
-    html+='<div class="proto-item'+(editProto===list[i].k?' on':'')+'" onclick="pickProto('+list[i].k+')"><span class="pt-name">'+list[i].n+'</span><span class="pt-radio"></span></div>';
-  }
-  document.getElementById("protoOpts").innerHTML=html;
-  document.getElementById("protoMask").className="mask show";
-}
-function pickProto(k){
-  editProto=k;
-  var names={3:"TCP + UDP",1:"仅 TCP",2:"仅 UDP",15:"所有协议"};
-  document.getElementById("protoSel").firstChild.textContent=names[k]||"所有协议";
-  document.getElementById("protoMask").className="mask";
-}
 function showCloseDlg(){
   var html="";
   for(var i=0;i<workbench.length;i++){
@@ -852,7 +830,7 @@ function saveEditor(){
     p.in_pass=(ipl_>=0?ipl_:0);
   }
   else if(il>=0){ p.in_loss=il; delete p.in_pass; } else { p.in_loss=-1; delete p.in_pass; }
-  p.protocol=editProto;
+  p.protocol=parseInt(document.getElementById("protoSel").value)||15;
   if(editingIdx!=null&&workbench[editingIdx]){
     var t=workbench[editingIdx]; t.name=name; if(desc)t.desc=desc; t.p=p; t.close_id=editingCloseId;
   } else {
