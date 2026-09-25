@@ -156,6 +156,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .app-right{display:flex;flex-direction:column;align-items:stretch;gap:8px;flex-shrink:0;min-width:96px}
 .app-right .service-status{text-align:center}
 .app-right .start-btn-new{text-align:center}
+.section-title{font-size:13px;color:var(--text-sub);font-weight:600;padding:14px 16px 6px;display:flex;align-items:center}
+.section-title::before{content:'';width:3px;height:14px;background:var(--blue);border-radius:2px;margin-right:6px}
 .scene-list { margin-top: 10px; background: #fff; overflow: hidden; }
 .scene-item-wrapper { position: relative; overflow: hidden; }
 .scene-item-wrapper { animation: listSlide 0.3s ease both; }
@@ -719,7 +721,7 @@ function setRunning(on){
     ss.style.color=on?"#34a853":"#999";
   }
   var rb=document.getElementById("runbar");
-  if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="网络场景 · 弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
+  if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
   else rb.style.display="none";
 }
 
@@ -893,7 +895,7 @@ function qnetAndroidCallApi(json){
         var st=json.status;
         var on=(st===0||st===4);
         if(on!==running)setRunning(on);
-        if(st===4){ var rb=document.getElementById("runbar"); if(rb.style.display!=="none"){ var i=findWb(selectedId); rb.innerHTML="网络场景 · 弱网已暂停"+(i>=0?" · "+workbench[i].name:""); } }
+        if(st===4){ var rb=document.getElementById("runbar"); if(rb.style.display!=="none"){ var i=findWb(selectedId); rb.innerHTML="弱网已暂停"+(i>=0?" · "+workbench[i].name:""); } }
         break;
       case "update_qnet_by_qnet":
         if(json.profile_id==="__switch__"){
