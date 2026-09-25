@@ -158,8 +158,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .app-right .start-btn-new{text-align:center}
 .section-title{font-size:13px;color:var(--text-sub);font-weight:600;padding:14px 16px 6px;display:flex;align-items:center}
 .section-title::before{content:'';width:3px;height:14px;background:var(--blue);border-radius:2px;margin-right:6px}
-.scene-list { margin-top: 10px; background: #fff; overflow: hidden; }
-.scene-item-wrapper { position: relative; overflow: hidden; }
+.scene-list { margin-top: 4px; padding: 0 12px; overflow: visible; }
+.scene-item-wrapper { position: relative; overflow: hidden; margin-bottom: 10px; }
 .scene-item-wrapper { animation: listSlide 0.3s ease both; }
 .scene-item-wrapper:nth-child(1) { animation-delay: 0.02s; }
 .scene-item-wrapper:nth-child(2) { animation-delay: 0.04s; }
@@ -169,10 +169,10 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .scene-item-wrapper:nth-child(6) { animation-delay: 0.12s; }
 .scene-item-wrapper:nth-child(7) { animation-delay: 0.14s; }
 .scene-item-wrapper:nth-child(8) { animation-delay: 0.16s; }
-.scene-item { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; position: relative; background: #fff; transition: transform 0.2s ease, background 0.15s; z-index: 2; }
-.scene-item:active { background: #f5f9ff; }
-.scene-item:last-child { border-bottom: none; }
-.scene-item.active { background: #E8F8FF; }
+.scene-item { padding: 14px 16px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; position: relative; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s ease, background 0.15s, box-shadow 0.15s; z-index: 2; }
+.scene-item:active { background: #f5f9ff; box-shadow: 0 1px 4px rgba(0,0,0,0.08); transform: scale(0.98); }
+.scene-item-wrapper:last-child { margin-bottom: 0; }
+.scene-item.active { background: #E8F8FF; box-shadow: 0 2px 12px rgba(59,130,246,0.15); border: 1.5px solid var(--blue); }
 .scene-name { font-size: 16px; margin-bottom: 4px; }
 .scene-desc { font-size: 12px; color: var(--text-sub); }
 .scene-action { color: var(--text-sub); font-size: 13px; display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 12px; transition: color 0.2s; }
