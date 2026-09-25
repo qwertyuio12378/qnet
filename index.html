@@ -490,7 +490,9 @@ try{ var _open=store.get("qn_open"); if(_open!==null) isOpenState=(_open==="1");
     if(workbench[j].id && String(workbench[j].id).indexOf("s_fixed_")===0){ workbench.splice(j,1); }
   }
   for(var i=fixed.length-1;i>=0;i--){
-    workbench.unshift({id:"s_fixed_"+i,name:fixed[i].name,desc:fixed[i].desc,p:fixed[i].p,scene:1,close_id:_fixedCloseMap[fixed[i].name]||""});
+    var _cid=_fixedCloseMap[fixed[i].name]||"";
+    if(!_cid&&fixed[i].name.indexOf("开启")>=0) _cid="s_fixed_0";
+    workbench.unshift({id:"s_fixed_"+i,name:fixed[i].name,desc:fixed[i].desc,p:fixed[i].p,scene:1,close_id:_cid});
   }
   try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
 })();
