@@ -252,6 +252,7 @@ document.addEventListener('click',function(e){
         </div>
       </div>
     </div>
+    <div class="section-title">网络场景</div>
     <div class="scene-list" id="tplList"></div>
     <div class="empty" id="emptyTip" style="display:none;text-align:center;padding:60px 0 40px;color:var(--text-sub);">
       <div style="font-size:40px;margin-bottom:12px;">📭</div>
@@ -718,7 +719,7 @@ function setRunning(on){
     ss.style.color=on?"#34a853":"#999";
   }
   var rb=document.getElementById("runbar");
-  if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
+  if(on){ var i=findWb(selectedId); rb.style.display="block"; rb.innerHTML="网络场景 · 弱网生效中"+(i>=0?" · "+workbench[i].name:""); }
   else rb.style.display="none";
 }
 
@@ -892,7 +893,7 @@ function qnetAndroidCallApi(json){
         var st=json.status;
         var on=(st===0||st===4);
         if(on!==running)setRunning(on);
-        if(st===4){ var rb=document.getElementById("runbar"); if(rb.style.display!=="none"){ var i=findWb(selectedId); rb.innerHTML="弱网已暂停"+(i>=0?" · "+workbench[i].name:""); } }
+        if(st===4){ var rb=document.getElementById("runbar"); if(rb.style.display!=="none"){ var i=findWb(selectedId); rb.innerHTML="网络场景 · 弱网已暂停"+(i>=0?" · "+workbench[i].name:""); } }
         break;
       case "update_qnet_by_qnet":
         if(json.profile_id==="__switch__"){
