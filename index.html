@@ -477,6 +477,8 @@ var SCENES=[
 ];
 var PROTONAMES={15:"全部协议",1:"TCP",2:"UDP",4:"DNS",8:"ICMP",3:"TCP+UDP"};
 var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb) workbench=JSON.parse(_wb)||[];}catch(e){}
+try{ var _sel=store.get("qn_sel"); if(_sel&&findWb(_sel)>=0) selectedId=_sel; }catch(e){}
+try{ var _open=store.get("qn_open"); if(_open!==null) isOpenState=(_open==="1"); }catch(e){}
 (function(){
   var fixed=[
     {name:"2.9全局不拉回关闭",p:{out_bandwidth:180,out_delay:13,in_delay:0}},
@@ -624,7 +626,7 @@ function renderWork(){
   document.getElementById("tplList").innerHTML=html;
   document.getElementById("emptyTip").style.display=(workbench.length===0)?"block":"none";
 }
-function selectTpl(id){ selectedId=id;
+function selectTpl(id){ selectedId=id; try{store.set("qn_sel",id);}catch(e){}
   document.querySelectorAll("#tplList .scene-item").forEach(function(el){ el.classList.remove("active"); });
   event && event.currentTarget && event.currentTarget.classList.add("active");
   if(running){ var i=findWb(id); if(i>=0){ applyTplToNative(workbench[i]); setRunning(true); } }
@@ -912,16 +914,16 @@ function qnetAndroidCallApi(json){
           if(closeId){
             if(isOpenState){
               var ci=findWb(closeId);
-              if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; showToast("进入关闭参数"); }
+              if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; try{store.set("qn_open","0");}catch(e){} showToast("进入关闭参数"); }
             }else{
-              if(t){ applyTplToNative(t); isOpenState=true; showToast("进入开启参数"); }
+              if(t){ applyTplToNative(t); isOpenState=true; try{store.set("qn_open","1");}catch(e){} showToast("进入开启参数"); }
             }
           }else{
             if(!running){ doStart(); }
             else{ callNative({api:"toggle_qnet_pause"}); }
           }
         }else if(json.profile_id){
-          selectedId=json.profile_id;
+          selectedId=json.profile_id; try{store.set("qn_sel",json.profile_id);}catch(e){}
           renderWork();
           var idx=findWb(selectedId);
           if(idx>=0) applyTplToNative(workbench[idx]);
@@ -929,7 +931,7 @@ function qnetAndroidCallApi(json){
         break;
       case "start_qnet":
         if(json.result===0||json.result===1){
-          isOpenState=true; isPaused=false;
+          isOpenState=true; isPaused=false; try{store.set("qn_open","1");}catch(e){}
           setRunning(true);
           var ot=findOpenTpl();
           if(ot){ selectedId=ot.id; renderWork(); applyTplToNative(ot); }
