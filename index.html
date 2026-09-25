@@ -615,7 +615,7 @@ function renderWork(){
     if(kw && t.name.indexOf(kw)<0 && (t.desc||"").indexOf(kw)<0) continue;
     html+='<div class="scene-item-wrapper"><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')">'
       +'<div><div class="scene-name">'+t.name+'</div>'+(t.desc?'<div class="scene-desc">'+t.desc+'</div>':'')+'</div>'
-      +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">编辑 <span>›</span></div></div></div>';
+      +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">配置 <span>&gt;</span></div></div></div>';
   }
   document.getElementById("tplList").innerHTML=html;
   document.getElementById("emptyTip").style.display=(workbench.length===0)?"block":"none";
