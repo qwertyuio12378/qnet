@@ -421,18 +421,9 @@ document.addEventListener('click',function(e){
     <div class="mod-section" style="margin-bottom:0">
       <div class="mod-row" style="border-bottom:none">
         <span class="mod-label">关闭参数</span>
-        <div class="sel" id="closeSel" onclick="showCloseDlg()">不选择</div>
+        <select class="sel-native" id="closeSel" onchange="pickClose(this.value)"><option value="">不选择</option></select>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- 关闭参数选择 -->
-<div class="mask" id="closeMask" onclick="if(event.target===this)this.className='mask'">
-  <div class="dlg">
-    <h3>选择关闭参数</h3>
-    <div id="closeOpts"></div>
-    <div class="btns"><button class="bno" onclick="pickClose('')">不选择</button></div>
   </div>
 </div>
 
@@ -771,9 +762,15 @@ function openEditor(idx){
   editProto=p.protocol||15;
   document.getElementById("protoSel").value=editProto;
   editingCloseId=(t&&t.close_id)?t.close_id:"";
-  var _cname="不选择";
-  if(editingCloseId){ for(var _ci=0;_ci<workbench.length;_ci++){ if(workbench[_ci].id===editingCloseId){ _cname=workbench[_ci].name; break; } } }
-  document.getElementById("closeSel").firstChild.textContent=_cname;
+  var _csel=document.getElementById("closeSel");
+  var _copt='<option value="">不选择</option>';
+  for(var _ci=0;_ci<workbench.length;_ci++){
+    var _ct=workbench[_ci];
+    if(editingIdx!=null&&workbench[editingIdx]&&_ct.id===workbench[editingIdx].id) continue;
+    _copt+='<option value="'+_ct.id+'">'+_ct.name+'</option>';
+  }
+  _csel.innerHTML=_copt;
+  _csel.value=editingCloseId;
   try{ document.getElementById("delBtnBottom").style.display=(editingIdx!=null&&workbench[editingIdx])?"block":"none"; }catch(e){}
   try{ document.getElementById("delBtn12").style.display=(editingIdx!=null&&workbench[editingIdx])?"flex":"none"; }catch(e){}
   document.getElementById("editor").className="editor show";
@@ -784,24 +781,7 @@ function biasProb(a){ if(a&&a.length&&a[0]&&a[0].length>=3) return a[0][2]; retu
 function isCyclic(loss,pass){ return (pass!==undefined&&pass!==null); }
 function closeEditor(){ document.getElementById("editor").className="editor"; }
 function gv(id,def){ var v=document.getElementById(id).value.trim(); if(v==="")return def; return parseInt(v); }
-function showCloseDlg(){
-  var html="";
-  for(var i=0;i<workbench.length;i++){
-    var t=workbench[i];
-    if(editingIdx!=null&&workbench[editingIdx]&&t.id===workbench[editingIdx].id) continue;
-    html+='<div class="row" style="padding:12px 6px" onclick="pickClose(\''+t.id+'\')"><div class="main"><div class="t1" style="font-weight:400">'+t.name+'</div></div>'+(editingCloseId===t.id?'<span style="color:var(--blue)">✓</span>':'')+'</div>';
-  }
-  if(!html) html='<p style="text-align:center;color:#999;padding:20px">工作台暂无其他模板</p>';
-  document.getElementById("closeOpts").innerHTML=html;
-  document.getElementById("closeMask").className="mask show";
-}
-function pickClose(id){
-  editingCloseId=id||"";
-  var name="不选择";
-  if(id){ for(var i=0;i<workbench.length;i++){ if(workbench[i].id===id){ name=workbench[i].name; break; } } }
-  document.getElementById("closeSel").firstChild.textContent=name;
-  document.getElementById("closeMask").className="mask";
-}
+function pickClose(id){ editingCloseId=id||""; }
 function saveEditor(){
   var name=document.getElementById("e_name").value.trim()||"未命名";
   var desc=document.getElementById("e_desc").value.trim();
