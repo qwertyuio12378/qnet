@@ -161,9 +161,10 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .section-title::before{content:'';width:3px;height:14px;background:var(--blue);border-radius:2px;margin-right:6px}
 .scene-list { margin-top: 4px; padding: 0 12px; overflow: visible; }
 .scene-item-wrapper { position: relative; overflow: hidden; margin-bottom: 10px; }
-.scene-item { transition: transform 0.2s ease; width: calc(100% + 72px); box-sizing: border-box; overflow: hidden; }
-.scene-item-del { position:absolute; right:0; top:0; bottom:0; width:72px; background:#f44336; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; z-index:3; }
-.scene-item.swiped { transform: translateX(-72px) !important; }
+.scene-item { transition: all 0.2s ease; }
+.scene-item-del { width:0; overflow:hidden; background:#f44336; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; transition: width 0.2s ease; border-radius:0 16px 16px 0; }
+.scene-item.swiped { padding-right:0 !important; }
+.scene-item.swiped .scene-item-del { width:72px; }
 .scene-item-wrapper { animation: listSlide 0.3s ease both; }
 .scene-item-wrapper:nth-child(1) { animation-delay: 0.02s; }
 .scene-item-wrapper:nth-child(2) { animation-delay: 0.04s; }
@@ -595,9 +596,10 @@ function renderWork(){
     var t=workbench[i];
     if(kw && t.name.indexOf(kw)<0 && (t.desc||"").indexOf(kw)<0) continue;
     html+='<div class="scene-item-wrapper"><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')" ontouchstart="swipeStart(event,this)" ontouchend="swipeEnd(event,this)">'
-      +'<div class="scene-item-del" onclick="event.stopPropagation();delTpl('+i+')">删除</div>'
+      +'<div style="flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between">'
       +'<div><div class="scene-name">'+t.name+'</div>'+(t.desc?'<div class="scene-desc">'+t.desc+'</div>':'')+'</div>'
-      +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">配置 <span>&gt;</span></div></div></div>';
+      +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">配置 <span>&gt;</span></div></div>'
+      +'<div class="scene-item-del" onclick="event.stopPropagation();delTpl('+i+')">删除</div></div></div>';
   }
   document.getElementById("tplList").innerHTML=html;
   document.getElementById("emptyTip").style.display=(workbench.length===0)?"block":"none";
