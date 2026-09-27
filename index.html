@@ -594,7 +594,8 @@ function renderWork(){
   for(var i=0;i<workbench.length;i++){
     var t=workbench[i];
     if(kw && t.name.indexOf(kw)<0 && (t.desc||"").indexOf(kw)<0) continue;
-    html+='<div class="scene-item-wrapper"><div class="scene-item-del" onclick="event.stopPropagation();delTpl('+i+')">删除</div><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')" ontouchstart="swipeStart(event,this)" ontouchend="swipeEnd(event,this)">'
+    html+='<div class="scene-item-wrapper"><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')" ontouchstart="swipeStart(event,this)" ontouchend="swipeEnd(event,this)">'
+      +'<div class="scene-item-del" onclick="event.stopPropagation();delTpl('+i+')">删除</div>'
       +'<div><div class="scene-name">'+t.name+'</div>'+(t.desc?'<div class="scene-desc">'+t.desc+'</div>':'')+'</div>'
       +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">配置 <span>&gt;</span></div></div></div>';
   }
