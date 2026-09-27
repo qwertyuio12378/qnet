@@ -366,13 +366,11 @@ document.addEventListener('click',function(e){
     <div class="mod-section">
       <div class="mod-row"><span class="mod-label">上行</span>
         <div class="multi-field">
-          <span class="sub-label">抖动最大</span><input class="f-input" type="number" id="e_odj" placeholder="0"><span class="mod-unit">ms</span>
           <span class="sub-label">丢包率</span><input class="f-input" type="number" id="e_ol" placeholder="-1"><span class="mod-unit">%</span>
         </div>
       </div>
       <div class="mod-row" style="border-bottom:none"><span class="mod-label">下行</span>
         <div class="multi-field">
-          <span class="sub-label">抖动最大</span><input class="f-input" type="number" id="e_idj" placeholder="0"><span class="mod-unit">ms</span>
           <span class="sub-label">丢包率</span><input class="f-input" type="number" id="e_il" placeholder="-1"><span class="mod-unit">%</span>
         </div>
       </div>
@@ -750,7 +748,6 @@ function openEditor(idx){
   document.getElementById("e_desc").value=t&&t.desc&&t.desc.indexOf("推荐理由")!==0?t.desc:"";
   setV("e_ob",p.out_bandwidth); setV("e_ib",p.in_bandwidth);
   setV("e_od",p.out_delay); setV("e_id",p.in_delay);
-  setV("e_odj",biasMax(p.out_delaybiasarray)); setV("e_idj",biasMax(p.in_delaybiasarray));
   setV("e_odjit",biasMax(p.out_delaybiasarray)); setV("e_idjit",biasMax(p.in_delaybiasarray));
   setV("e_odjitp",biasProb(p.out_delaybiasarray)); setV("e_idjitp",biasProb(p.in_delaybiasarray));
   var cycO=isCyclic(p.out_loss,p.out_pass), cycI=isCyclic(p.in_loss,p.in_pass);
@@ -791,9 +788,6 @@ function saveEditor(){
   }
   var ob=gv("e_ob",-1),ib=gv("e_ib",-1); if(ob>=0)p.out_bandwidth=ob; if(ib>=0)p.in_bandwidth=ib;
   var od=gv("e_od",-1),idd=gv("e_id",-1); if(od>=0)p.out_delay=od; if(idd>=0)p.in_delay=idd;
-  var odj=gv("e_odj",0),idj=gv("e_idj",0);
-  if(odj>0)p.out_delaybiasarray=[[0,odj,100]];
-  if(idj>0)p.in_delaybiasarray=[[0,idj,100]];
   var odjit=gv("e_odjit",0),idjit=gv("e_idjit",0);
   var odjitp=gv("e_odjitp",100),idjitp=gv("e_idjitp",100);
   if(odjit>0)p.out_delaybiasarray=[[0,odjit,odjitp]];
