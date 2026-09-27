@@ -345,10 +345,6 @@ document.addEventListener('click',function(e){
       <span class="mod-label" style="width:auto">模板名称</span>
       <input type="text" id="e_name" placeholder="未命名" style="flex:1;text-align:right;border:none;outline:none;font-size:15px">
     </div>
-    <div class="mod-row" style="background:#fff;margin:0 12px;border-radius:0 0 10px 10px;border-top:1px solid #f0f0f0">
-      <span class="mod-label" style="width:auto">模板介绍</span>
-      <input type="text" id="e_desc" placeholder="输入模板介绍（选填）" style="flex:1;text-align:right;border:none;outline:none;font-size:14px;color:#666">
-    </div>
 
     <div class="mod-title"><span class="mod-tag">网络带宽</span></div>
     <div class="mod-section">
@@ -402,14 +398,18 @@ document.addEventListener('click',function(e){
 
     <div class="mod-title"><span class="mod-tag">协议设置</span></div>
     <div class="mod-section">
-      <div class="mod-row" style="border-bottom:none"><span class="mod-label">协议类型</span><select class="sel-native" id="protoSel" style="font-size:14px"><option value="15">所有协议</option><option value="3">TCP + UDP</option><option value="1">仅 TCP</option><option value="2">仅 UDP</option></select></div>
+      <div class="mod-row" style="border-bottom:none"><span class="mod-label">协议类型</span><select class="sel-native" id="protoSel" style="font-size:14px"><option value="15">所有协议</option><option value="3">TCP + UDP</option><option value="1">仅 TCP</option><option value="2">仅 UDP</option><option value="8">ICMP</option></select></div>
     </div>
 
     <div class="mod-title"><span class="mod-tag">其他</span></div>
     <div class="mod-section" style="margin-bottom:0">
-      <div class="mod-row" style="border-bottom:none">
+      <div class="mod-row">
         <span class="mod-label">关闭参数</span>
         <select class="sel-native" id="closeSel" onchange="pickClose(this.value)"><option value="">不选择</option></select>
+      </div>
+      <div class="mod-row" style="border-bottom:none;border-top:1px solid #f0f0f0">
+        <span class="mod-label" style="width:auto">模板介绍</span>
+        <input type="text" id="e_desc" placeholder="输入模板介绍（选填）" style="flex:1;text-align:right;border:none;outline:none;font-size:14px;color:#666">
       </div>
     </div>
   </div>
