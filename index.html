@@ -161,6 +161,9 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .section-title::before{content:'';width:3px;height:14px;background:var(--blue);border-radius:2px;margin-right:6px}
 .scene-list { margin-top: 4px; padding: 0 12px; overflow: visible; }
 .scene-item-wrapper { position: relative; overflow: hidden; margin-bottom: 10px; }
+.scene-item-del { position:absolute; right:0; top:0; bottom:0; width:70px; background:#f44336; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; z-index:1; }
+.scene-item { transition: transform 0.2s ease; }
+.scene-item.swiped { transform: translateX(-70px); }
 .scene-item-wrapper { animation: listSlide 0.3s ease both; }
 .scene-item-wrapper:nth-child(1) { animation-delay: 0.02s; }
 .scene-item-wrapper:nth-child(2) { animation-delay: 0.04s; }
@@ -338,10 +341,7 @@ document.addEventListener('click',function(e){
 <div class="editor" id="editor">
   <div class="hd"><span class="left" onclick="closeEditor()">‹</span><span id="edTitle">编辑模板</span><span class="right" onclick="saveEditor()">保存</span></div>
   <div class="body">
-    <div style="padding:16px">
-      <button onclick="deleteCurrentTpl()" id="delBtnBottom" style="width:100%;padding:12px;border:1px solid #eee;border-radius:6px;background:#fafafa;color:#f44336;font-size:14px">删除模板</button>
-    </div>
-    <div class="mod-row" style="background:#fff;margin:12px 12px 0;border-radius:10px;overflow:hidden">
+        <div class="mod-row" style="background:#fff;margin:12px 12px 0;border-radius:10px;overflow:hidden">
       <span class="mod-label" style="width:auto">模板名称</span>
       <input type="text" id="e_name" placeholder="未命名" style="flex:1;text-align:right;border:none;outline:none;font-size:15px">
     </div>
@@ -594,7 +594,7 @@ function renderWork(){
   for(var i=0;i<workbench.length;i++){
     var t=workbench[i];
     if(kw && t.name.indexOf(kw)<0 && (t.desc||"").indexOf(kw)<0) continue;
-    html+='<div class="scene-item-wrapper"><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')">'
+    html+='<div class="scene-item-wrapper"><div class="scene-item-del" onclick="event.stopPropagation();delTpl('+i+')">删除</div><div class="scene-item'+(t.id===selectedId?' active':'')+'" onclick="selectTpl(\''+t.id+'\')" ontouchstart="swipeStart(event,this)" ontouchend="swipeEnd(event,this)">'
       +'<div><div class="scene-name">'+t.name+'</div>'+(t.desc?'<div class="scene-desc">'+t.desc+'</div>':'')+'</div>'
       +'<div class="scene-action" onclick="event.stopPropagation();openEditor('+i+')">配置 <span>&gt;</span></div></div></div>';
   }
@@ -605,6 +605,14 @@ function selectTpl(id){ selectedId=id; try{store.set("qn_sel",id);}catch(e){}
   document.querySelectorAll("#tplList .scene-item").forEach(function(el){ el.classList.remove("active"); });
   event && event.currentTarget && event.currentTarget.classList.add("active");
   if(running){ var i=findWb(id); if(i>=0){ applyTplToNative(workbench[i]); setRunning(true); } }
+}
+var _swipeX=0;
+function swipeStart(e){ _swipeX=e.touches[0].clientX; }
+function swipeEnd(e){
+  var dx=e.changedTouches[0].clientX-_swipeX;
+  var el=e.currentTarget;
+  if(dx<-40){ el.classList.add('swiped'); }
+  else if(dx>40){ el.classList.remove('swiped'); }
 }
 function delTpl(i){
   var t=workbench[i];
