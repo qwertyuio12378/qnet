@@ -322,10 +322,8 @@ document.addEventListener('click',function(e){
       <div class="gtitle" style="padding:12px 14px 8px">关于</div>
       <div style="padding:0 14px 12px;font-size:13px;color:#666;line-height:1.8">
         <div style="margin-bottom:8px;color:#999">我们的理念：<br>1. 让科技服务于人民。<br>2. 实惠、便宜、好用。<br>3. 反馈bug会及时处理。<br>4. 反馈邮箱 qwertyuio123911@qq.com</div>
-        <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">版本：</span>V8.9.27</div>
         <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">作者：</span>梦的开始·博哥</div>
         <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">反馈QQ群：</span>1036856569</div>
-        <div id="aboutVerInline" style="color:#999;font-size:12px"></div>
       </div>
     </div>
   </div>
@@ -936,7 +934,6 @@ function showToast(m){
 window.onload=function(){
 
   var osv="";try{var m=navigator.userAgent.match(/Android\s+(\d+[\d.]*)/);osv=m?m[1]:"未知";}catch(e){osv="未知";}
-  try{ var avi=document.getElementById("aboutVerInline"); if(avi) avi.innerHTML="应用版本: 8.9.27(80927)<br>系统版本：Android "+osv; }catch(e){}
   try{ var av=document.getElementById("aboutVer"); if(av) av.innerHTML="应用版本: 8.9.27<br>系统版本：Android "+osv; }catch(e){}
   renderWork(); renderScenes(); refreshSw(); renderUser();
   callNative({api:"set_qnet_option",dump_pcap:opts.pcap,dump_report:opts.report,control_fw:opts.cfw,info_fw:opts.ifw,editorStyle:opts.editorStyle});
