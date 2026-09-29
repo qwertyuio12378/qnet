@@ -480,13 +480,19 @@ function refreshTemplates(){
   renderWork(); renderScenes(); syncProfilesToNative();
   showToast("模板已刷新");
 }
-/* 没有固定模板时自动注入，有则保留不覆盖 */
+/* 仅工作台完全为空时自动注入，有任何模板则不自动刷新 */
 (function(){
-  var _has=false;
-  for(var j=0;j<workbench.length;j++){
-    if(workbench[j].id && String(workbench[j].id).indexOf("s_fixed_")===0){ _has=true; break; }
+  if(workbench.length===0){
+    var fixed=[
+      {name:"2.9全局不拉回关闭",p:{out_delay:0,out_bandwidth:1000,out_loss:0,in_delay:0,in_bandwidth:0,in_loss:0,protocol:3}},
+      {name:"2.9全局不拉回开启",p:{out_delay:0,out_bandwidth:1,out_loss:0,in_delay:0,in_bandwidth:8000,in_loss:0,in_pass:1000,protocol:3}}
+    ];
+    for(var i=fixed.length-1;i>=0;i--){
+      var _cid=(fixed[i].name.indexOf("开启")>=0)?"s_fixed_0":"";
+      workbench.unshift({id:"s_fixed_"+i,name:fixed[i].name,desc:"",p:fixed[i].p,scene:1,close_id:_cid});
+    }
+    try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
   }
-  if(!_has) refreshTemplates();
 })();
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
 var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
