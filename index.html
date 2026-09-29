@@ -318,6 +318,10 @@ document.addEventListener('click',function(e){
   </div>
   <div class="gtitle">关于</div>
   <div class="card">
+    <div class="row" onclick="refreshTemplates()">
+      <div class="main"><div class="t1">刷新模板</div></div>
+      <div class="arrow">›</div>
+    </div>
     <div class="row" onclick="showToast('当前版本已经是最新')">
       <div class="main"><div class="t1">版本更新</div></div>
       <div style="color:var(--sub);font-size:13px">当前版本已经是最新</div>
@@ -453,19 +457,17 @@ var PROTONAMES={15:"全部协议",1:"TCP",2:"UDP",4:"DNS",8:"ICMP",3:"TCP+UDP"};
 var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb) workbench=JSON.parse(_wb)||[];}catch(e){}
 try{ var _sel=store.get("qn_sel"); if(_sel&&findWb(_sel)>=0) selectedId=_sel; }catch(e){}
 try{ var _open=store.get("qn_open"); if(_open!==null) isOpenState=(_open==="1"); }catch(e){}
-(function(){
+function refreshTemplates(){
   var fixed=[
     {name:"2.9全局不拉回关闭",p:{out_delay:0,out_bandwidth:1000,out_loss:0,in_delay:0,in_bandwidth:0,in_loss:0,protocol:3}},
     {name:"2.9全局不拉回开启",p:{out_delay:0,out_bandwidth:1,out_loss:0,in_delay:0,in_bandwidth:8000,in_loss:0,in_pass:1000,protocol:3}}
   ];
-  /* 保存旧固定模板的close_id，避免重建后丢失 */
   var _fixedCloseMap={};
   for(var j=0;j<workbench.length;j++){
     if(workbench[j].id && String(workbench[j].id).indexOf("s_fixed_")===0 && workbench[j].close_id){
       _fixedCloseMap[workbench[j].name]=workbench[j].close_id;
     }
   }
-  /* 每次加载先移除旧的固定模板，再重新注入，确保固定模板始终显示在工作台 */
   for(var j=workbench.length-1;j>=0;j--){
     if(workbench[j].id && String(workbench[j].id).indexOf("s_fixed_")===0){ workbench.splice(j,1); }
   }
@@ -475,6 +477,16 @@ try{ var _open=store.get("qn_open"); if(_open!==null) isOpenState=(_open==="1");
     workbench.unshift({id:"s_fixed_"+i,name:fixed[i].name,desc:fixed[i].desc,p:fixed[i].p,scene:1,close_id:_cid});
   }
   try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
+  renderWork(); renderScenes(); syncProfilesToNative();
+  showToast("模板已刷新");
+}
+/* 首次进入且无固定模板时自动注入一次 */
+(function(){
+  var _has=false;
+  for(var j=0;j<workbench.length;j++){
+    if(workbench[j].id && String(workbench[j].id).indexOf("s_fixed_")===0){ _has=true; break; }
+  }
+  if(!_has) refreshTemplates();
 })();
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
 var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
