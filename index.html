@@ -480,14 +480,13 @@ function refreshTemplates(){
   renderWork(); renderScenes(); syncProfilesToNative();
   showToast("模板已刷新");
 }
-/* 仅首次启动自动注入一次，之后完全手动刷新 */
+/* 没有固定模板时自动注入，有则保留不覆盖 */
 (function(){
-  try{
-    if(!localStorage.getItem("qn_fixed_done")){
-      refreshTemplates();
-      localStorage.setItem("qn_fixed_done","1");
-    }
-  }catch(e){}
+  var _has=false;
+  for(var j=0;j<workbench.length;j++){
+    if(workbench[j].id && String(workbench[j].id).indexOf("s_fixed_")===0){ _has=true; break; }
+  }
+  if(!_has) refreshTemplates();
 })();
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
 var selectedId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
