@@ -789,6 +789,7 @@ function showAbout(){
 
 /* ===== 编辑器 ===== */
 function openEditor(idx){
+  if(idx!=null&&workbench[idx]&&workbench[idx].id&&String(workbench[idx].id).indexOf("vip_")===0){ showToast("此参数为受保护参数"); return; }
   editingIdx=idx; editProto=15;
   var t=(idx!=null&&workbench[idx])?workbench[idx]:null;
   document.getElementById("edTitle").textContent=t?"编辑模板":"新增模板";
