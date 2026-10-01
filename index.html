@@ -301,7 +301,7 @@ document.addEventListener('click',function(e){
 <div class="page" id="page-set">
   <div class="set-topbar">
     <div class="save-btn" onclick="showToast('已保存')">保存</div>
-    <div class="set-title">QXET NEXT</div>
+    <div class="set-title">QXNET</div>
     <div style="width:40px"></div>
   </div>
   <div class="set-grid">
@@ -336,8 +336,8 @@ document.addEventListener('click',function(e){
   </div>
   <div class="set-info-card">
     <div class="set-info-row"><span class="label">开发者</span><span class="value">qq:2724694101</span></div>
-    <div class="set-info-row"><span class="label">版本号</span><span class="value">8.9.27</span></div>
-    <div class="set-info-row"><span class="label">卡网</span><span class="value">弱网.top</span></div>
+    <div class="set-info-row"><span class="label">版本号</span><span class="value">2.1.5</span></div>
+    <div class="set-info-row"><span class="label">卡网</span><span class="value">暂无</span></div>
     <div class="set-info-row"><span class="label">官网</span><span class="value">qwertyuio12378.github.io</span></div>
   </div>
 </div>
@@ -750,11 +750,11 @@ function toggleEditorStyle(){
 }
 function toggleOpt(k){
   opts[k]=opts[k]?0:1; saveOpts();
-  document.getElementById("sw_"+k).className="sw"+(opts[k]?" on":"");
-  refreshSw();
+  var el=document.getElementById("sw_"+k); if(el) el.className="sw"+(opts[k]?" on":"");
+  var el2=document.getElementById("sw_"+k+"_new"); if(el2) el2.className="set-switch"+(opts[k]?" on":"");
   callNative({api:"set_qnet_option",dump_pcap:opts.pcap,dump_report:opts.report,control_fw:opts.cfw,info_fw:opts.ifw,editorStyle:opts.editorStyle});
 }
-function refreshSw(){ ["cfw","ifw","anti"].forEach(function(k){ document.getElementById("sw_"+k).className="sw"+(opts[k]?" on":""); }); }
+function refreshSw(){ ["cfw","ifw","anti"].forEach(function(k){ var el=document.getElementById("sw_"+k); if(el) el.className="sw"+(opts[k]?" on":""); var el2=document.getElementById("sw_"+k+"_new"); if(el2) el2.className="set-switch"+(opts[k]?" on":""); }); }
 function showAbout(){
   var av=document.getElementById("aboutVer");
   av.innerHTML="应用版本: 8.9.27(80927)<br>系统版本："+(window._osver||"");
