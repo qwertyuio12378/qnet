@@ -259,7 +259,7 @@ document.addEventListener('click',function(e){
 
 <!-- 工作台 -->
 <div class="page active" id="page-work">
-    <div class="hd">NEXT<div class="right" onclick="openEditor()">新增</div></div>
+    <div class="hd">QXNET<div class="right" onclick="openEditor()">新增</div></div>
     <div class="search-bar">
       <div class="search-input" onclick="document.getElementById('kw').focus()">
         <svg viewbox="0 0 24 24" style="width:18px;height:18px;fill:var(--text-sub);flex-shrink:0;">
@@ -284,7 +284,7 @@ document.addEventListener('click',function(e){
         </div>
         <div class="app-right">
           <div class="service-status" id="serviceStatus">服务未启动</div>
-          <button class="start-btn-new" id="mainBtn" onclick="event.stopPropagation();onMainBtn()">启动NEXT</button>
+          <button class="start-btn-new" id="mainBtn" onclick="event.stopPropagation();onMainBtn()">启动QXNET</button>
         </div>
       </div>
     </div>
@@ -727,7 +727,7 @@ function onMainBtn(){ if(!checkLogin()) return;
 function setRunning(on){
   running=on;
   var b=document.getElementById("mainBtn");
-  b.textContent=on?"关闭NEXT":"启动NEXT";
+  b.textContent=on?"关闭QXNET":"启动QXNET";
   b.className="start-btn-new"+(on?" running":"");
   var ss=document.getElementById("serviceStatus");
   if(ss){
