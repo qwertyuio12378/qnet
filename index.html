@@ -888,9 +888,9 @@ function qnetAndroidCallApi(json){
           if(closeId){
             if(isOpenState){
               var ci=findWb(closeId);
-              if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; try{store.set("qn_open","0");}catch(e){} showToast("进入关闭参数"); }
+              if(ci>=0){ applyTplToNative(workbench[ci]); isOpenState=false; selectedId=workbench[ci].id; try{store.set("qn_open","0");store.set("qn_sel",selectedId);}catch(e){} renderWork(); showToast("进入关闭参数"); }
             }else{
-              if(t){ applyTplToNative(t); isOpenState=true; try{store.set("qn_open","1");}catch(e){} showToast("进入开启参数"); }
+              if(t){ applyTplToNative(t); isOpenState=true; selectedId=t.id; try{store.set("qn_open","1");store.set("qn_sel",selectedId);}catch(e){} renderWork(); showToast("进入开启参数"); }
             }
           }else{
             if(!running){ doStart(); }
