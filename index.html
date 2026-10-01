@@ -567,8 +567,8 @@ function fillProfile(p){
   if(o.in_loss===undefined||o.in_loss<0) o.in_loss=0;
   if(o.out_delay===undefined||o.out_delay<0) o.out_delay=0;
   if(o.in_delay===undefined||o.in_delay<0) o.in_delay=0;
-  if(o.out_bandwidth===undefined||o.out_bandwidth<0) o.out_bandwidth=100000;
-  if(o.in_bandwidth===undefined||o.in_bandwidth<0) o.in_bandwidth=100000;
+  if(o.out_bandwidth!==undefined&&o.out_bandwidth<0) delete o.out_bandwidth;
+  if(o.in_bandwidth!==undefined&&o.in_bandwidth<0) delete o.in_bandwidth;
   if(o.protocol===undefined||o.protocol<0) o.protocol=3;
   if(o.out_pass<0) delete o.out_pass;
   if(o.in_pass<0) delete o.in_pass;
