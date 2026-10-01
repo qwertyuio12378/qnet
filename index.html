@@ -330,7 +330,7 @@ document.addEventListener('click',function(e){
       <div class="card-body" style="flex-direction:column;align-items:flex-start">
         <span class="set-pill-btn" onclick="showToast('工艺参数')">工艺参数</span>
         <span class="set-pill-btn" onclick="refreshTemplates()">获取模板</span>
-        <span class="set-pill-btn" onclick="showToast('参数VIP专享')">参数VIP专享</span>
+        <span class="set-pill-btn" onclick="showToast('未开放');opts.ifw=0;saveOpts();var e=document.getElementById('sw_ifw_new');if(e)e.className='set-switch';callNative({api:'set_qnet_option',info_fw:0})">参数VIP专享</span>
       </div>
     </div>
   </div>
@@ -338,7 +338,7 @@ document.addEventListener('click',function(e){
     <div class="set-info-row"><span class="label">开发者</span><span class="value">qq:2724694101</span></div>
     <div class="set-info-row"><span class="label">版本号</span><span class="value">2.1.5</span></div>
     <div class="set-info-row"><span class="label">卡网</span><span class="value">暂无</span></div>
-    <div class="set-info-row"><span class="label">官网</span><span class="value">qwertyuio12378.github.io</span></div>
+    <div class="set-info-row"><span class="label">官网</span><span class="value">暂无</span></div>
   </div>
 </div>
 
