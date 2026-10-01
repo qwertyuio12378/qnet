@@ -328,9 +328,9 @@ document.addEventListener('click',function(e){
       <div class="card-title">参数替换</div>
       <div class="card-sub"></div>
       <div class="card-body" style="flex-direction:column;align-items:flex-start">
-        <span class="set-pill-btn" onclick="showToast('工艺参数')">工艺参数</span>
+        <span class="set-pill-btn" onclick="loadCharityTemplates()">公益模板</span>
         <span class="set-pill-btn" onclick="refreshTemplates()">获取模板</span>
-        <span class="set-pill-btn" onclick="showToast('未开放');opts.ifw=0;saveOpts();var e=document.getElementById('sw_ifw_new');if(e)e.className='set-switch';callNative({api:'set_qnet_option',info_fw:0})">参数VIP专享</span>
+        <span class="set-pill-btn" onclick="loadVipTemplates()">参数VIP专享</span>
       </div>
     </div>
   </div>
@@ -464,6 +464,31 @@ var PROTONAMES={15:"全部协议",1:"TCP",2:"UDP",4:"DNS",8:"ICMP",3:"TCP+UDP"};
 var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb){ try{ workbench=JSON.parse(_wb)||[]; }catch(e2){ workbench=[]; } }}catch(e){}
 try{ var _sel=store.get("qn_sel"); if(_sel&&findWb(_sel)>=0) selectedId=_sel; }catch(e){}
 try{ var _open=store.get("qn_open"); if(_open!==null) isOpenState=(_open==="1"); }catch(e){}
+function loadCharityTemplates(){
+  var tpls=[
+    {name:"公益关闭",p:{out_delay:0,out_bandwidth:1000,out_loss:0,in_delay:0,in_bandwidth:0,in_loss:0,protocol:3}},
+    {name:"公益开启",p:{out_delay:0,out_bandwidth:1,out_loss:0,in_delay:0,in_bandwidth:8000,in_loss:0,in_pass:1000,protocol:3}}
+  ];
+  for(var i=tpls.length-1;i>=0;i--){
+    var _cid=(tpls[i].name.indexOf("开启")>=0)?"charity_0":"";
+    workbench.unshift({id:"charity_"+i,name:tpls[i].name,desc:"",p:tpls[i].p,scene:1,close_id:_cid});
+  }
+  try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
+  renderWork(); showToast("公益模板已加载");
+}
+function loadVipTemplates(){
+  if(_loginType==='charity'){ showToast("不是会员"); return; }
+  var tpls=[
+    {name:"VIP关闭",p:{out_delay:10,out_bandwidth:153,protocol:3}},
+    {name:"VIP开启",p:{out_delaybiasarray:[[0,22,100]],out_bandwidth:3,out_pass:22,in_delay:12,in_delaybiasarray:[[0,4,100]],in_bandwidth:164,in_pass:153,protocol:3}}
+  ];
+  for(var i=tpls.length-1;i>=0;i--){
+    var _cid=(tpls[i].name.indexOf("开启")>=0)?"vip_0":"";
+    workbench.unshift({id:"vip_"+i,name:tpls[i].name,desc:"",p:tpls[i].p,scene:1,close_id:_cid});
+  }
+  try{ localStorage.setItem("qn_wb",JSON.stringify(workbench)); }catch(e){}
+  renderWork(); showToast("VIP模板已加载");
+}
 function refreshTemplates(){
   var fixed=[
     {name:"2.9全局不拉回关闭",p:{out_delay:10,out_bandwidth:153,protocol:3}},
@@ -489,6 +514,7 @@ function refreshTemplates(){
 }
 
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
+var _loginType=(function(){try{var m=location.search.match(/login=(\w+)/);if(m){localStorage.setItem('qn_login',m[1]);return m[1];}return localStorage.getItem('qn_login')||'vip';}catch(e){return 'vip';}})();
 var selectedId=null, activeTplId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
 /* ===== 账号系统 ===== */
 /* 登录系统已彻底移除 */
