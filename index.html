@@ -51,6 +51,29 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,"PingFang S
 .empty .box{width:86px;height:70px;margin:0 auto 18px;position:relative}
 .empty .t1{color:#8a8f99;font-size:15px}
 .empty .t2{color:#b5b5b5;font-size:12px;margin-top:8px}
+/* ===== 新设置页 ===== */
+.set-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px}
+.set-topbar .save-btn{font-size:16px;color:#3b82f6;font-weight:500}
+.set-topbar .set-title{font-size:20px;font-weight:700;color:#3b82f6;text-align:center;flex:1}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
+.set-card{background:#fff;border-radius:20px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.04);min-height:140px;display:flex;flex-direction:column}
+.set-card .card-title{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:4px}
+.set-card .card-sub{font-size:13px;color:#999;margin-bottom:16px}
+.set-card .card-body{flex:1;display:flex;align-items:center}
+.set-card .card-body.center{justify-content:center}
+.set-pill-btn{background:#3b82f6;color:#fff;border:none;border-radius:999px;padding:6px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;display:inline-block}
+.set-pill-btn:last-child{margin-bottom:0}
+.set-tip-text{color:#e74c3c;font-size:15px;line-height:1.8;text-align:center;font-weight:500}
+.set-info-card{background:#fff;border-radius:20px;margin:16px;padding:8px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.set-info-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f0f0f0}
+.set-info-row:last-child{border-bottom:none}
+.set-info-row .label{font-size:15px;color:#333}
+.set-info-row .value{font-size:15px;color:#666}
+.set-switch{position:relative;width:52px;height:30px;background:#ddd;border-radius:15px;transition:.2s;flex-shrink:0;cursor:pointer}
+.set-switch.on{background:#3b82f6}
+.set-switch .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.set-switch.on .knob{left:25px}
+
 .tabbar{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.25);backdrop-filter:blur(12px) saturate(160%);-webkit-backdrop-filter:blur(12px) saturate(160%);border:1px solid rgba(255,255,255,0.3);border-radius:999px;box-shadow:0 4px 20px rgba(31,38,135,0.1);display:flex;z-index:20;padding:2px;gap:2px}
 .tab{flex:0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;font-size:10px;color:#555;padding:2px 8px;border-radius:999px;cursor:pointer;transition:all .2s;line-height:1}.tab span{width:1.8em;text-align:center;white-space:normal;word-break:break-all}.tab .tabic{width:13px;height:13px;transition:transform .15s;color:#666;flex-shrink:0}.tab.on .tabic{color:#1e2235}.tab:active .tabic{transform:scale(.85)}
 .tab.on{background:rgba(255,255,255,0.7);color:#1e2235;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
@@ -276,71 +299,49 @@ document.addEventListener('click',function(e){
 
 <!-- 设置 -->
 <div class="page" id="page-set">
-  <div class="hd">设置</div>
-  <div class="userbar">
-    <div class="avatar" id="userAvatar" onclick="onAvatarClick()">
-      <img id="avatarImg" style="display:none">
-      <img id="avatarDef" src="data:image/webp;base64,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" style="width:100%;height:100%;object-fit:cover">
-    </div>
-    <div class="userinfo" onclick="onNameClick()">
-      <div class="uname" id="userName">离线用户</div>
-      <div class="udesc" id="userDesc"></div>
-    </div>
+  <div class="set-topbar">
+    <div class="save-btn" onclick="showToast('已保存')">保存</div>
+    <div class="set-title">QXET NEXT</div>
+    <div style="width:40px"></div>
   </div>
-  <div id="userSection" style="display:none">
-    <div class="gtitle">账号</div>
-    <div class="card">
-      <div class="row" onclick="editName()">
-        <div class="main"><div class="t1">修改昵称</div></div>
-        <div class="arrow">›</div>
-      </div>
-      <div class="row" onclick="pickAvatar()">
-        <div class="main"><div class="t1">修改头像</div></div>
-        <div class="arrow">›</div>
+  <div class="set-grid">
+    <div class="set-card">
+      <div class="card-title">悬浮窗</div>
+      <div class="card-sub">快捷控制球</div>
+      <div class="card-body">
+        <div class="set-switch" id="sw_cfw_new" onclick="toggleOpt('cfw')"><div class="knob"></div></div>
       </div>
     </div>
-  </div>
-  <div class="gtitle">悬浮窗设置</div>
-  <div class="card">
-    <div class="row">
-      <div class="main"><div class="t1">控制悬浮窗</div><div class="t2">显示/切换弱网模板</div></div>
-      <div class="sw" id="sw_cfw" onclick="toggleOpt('cfw')"><div class="k"></div></div>
+    <div class="set-card">
+      <div class="card-title">其他功能</div>
+      <div class="card-sub" style="margin-bottom:10px"><span class="set-pill-btn" onclick="refreshTemplates()">刷新</span></div>
+      <div class="card-body">
+        <div class="set-switch" id="sw_ifw_new" onclick="toggleOpt('ifw')"><div class="knob"></div></div>
+      </div>
     </div>
-    <div class="row">
-      <div class="main"><div class="t1">信息悬浮窗</div><div class="t2">弱网参数显示</div></div>
-      <div class="sw" id="sw_ifw" onclick="toggleOpt('ifw')"><div class="k"></div></div>
+    <div class="set-card">
+      <div class="card-body center">
+        <div class="set-tip-text">自带参数为工艺参数<br>如果和谐自行调整，<br>一旦工艺迟早和谐</div>
+      </div>
     </div>
-    <div class="row">
-      <div class="main"><div class="t1">防封禁</div><div class="t2">启用防封禁机制</div></div>
-      <div class="sw" id="sw_anti" onclick="toggleOpt('anti')"><div class="k"></div></div>
-    </div>
-  </div>
-  <div class="gtitle">账号</div>
-  <div class="card">
-    <div class="row" onclick="logout()">
-      <div class="main"><div class="t1" style="color:#f44336">退出登录</div><div class="t2">返回QQ登录页</div></div>
-      <div class="arrow">›</div>
-    </div>
-  </div>
-  <div class="gtitle">关于</div>
-  <div class="card">
-    <div class="row" onclick="refreshTemplates()">
-      <div class="main"><div class="t1">刷新模板</div></div>
-      <div class="arrow">›</div>
-    </div>
-    <div class="row" onclick="showToast('当前版本已经是最新')">
-      <div class="main"><div class="t1">版本更新</div></div>
-      <div style="color:var(--sub);font-size:13px">当前版本已经是最新</div>
-    </div>
-    <div class="card" style="margin:10px 12px">
-      <div class="gtitle" style="padding:12px 14px 8px">关于</div>
-      <div style="padding:0 14px 12px;font-size:13px;color:#666;line-height:1.8">
-        <div style="margin-bottom:8px;color:#999">我们的理念：<br>1. 让科技服务于人民。<br>2. 实惠、便宜、好用。<br>3. 反馈bug会及时处理。<br>4. 反馈邮箱 qwertyuio123911@qq.com</div>
-        <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">作者：</span>梦的开始·博哥</div>
-        <div style="margin-bottom:6px"><span style="color:#333;font-weight:500">反馈QQ群：</span>1036856569</div>
+    <div class="set-card">
+      <div class="card-title">参数替换</div>
+      <div class="card-sub"></div>
+      <div class="card-body" style="flex-direction:column;align-items:flex-start">
+        <span class="set-pill-btn" onclick="showToast('工艺参数')">工艺参数</span>
+        <span class="set-pill-btn" onclick="refreshTemplates()">获取模板</span>
+        <span class="set-pill-btn" onclick="showToast('参数VIP专享')">参数VIP专享</span>
       </div>
     </div>
   </div>
+  <div class="set-info-card">
+    <div class="set-info-row"><span class="label">开发者</span><span class="value">qq:2724694101</span></div>
+    <div class="set-info-row"><span class="label">版本号</span><span class="value">8.9.27</span></div>
+    <div class="set-info-row"><span class="label">卡网</span><span class="value">弱网.top</span></div>
+    <div class="set-info-row"><span class="label">官网</span><span class="value">qwertyuio12378.github.io</span></div>
+  </div>
+</div>
+
 </div>
 
 <div class="tabbar">
