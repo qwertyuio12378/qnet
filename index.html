@@ -315,7 +315,7 @@ document.addEventListener('click',function(e){
       <div class="card-title">其他功能</div>
       <div class="card-sub" style="margin-bottom:10px"><span class="set-pill-btn" onclick="refreshTemplates()">刷新</span></div>
       <div class="card-body">
-        <div class="set-switch" id="sw_ifw_new" onclick="toggleOpt('ifw')"><div class="knob"></div></div>
+        <div class="set-switch" id="sw_ifw_new" onclick="showToast('不可开启')"><div class="knob"></div></div>
       </div>
     </div>
     <div class="set-card">
@@ -513,6 +513,7 @@ function refreshTemplates(){
 }
 
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
+try{opts.ifw=0;store.set('qn_opts',JSON.stringify(opts));callNative({api:'set_qnet_option',info_fw:0});}catch(e){}
 var _loginType=(function(){try{var m=location.search.match(/login=(\w+)/);if(m){localStorage.setItem('qn_login',m[1]);return m[1];}return localStorage.getItem('qn_login')||'vip';}catch(e){return 'vip';}})();
 var selectedId=null, activeTplId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
 /* ===== 账号系统 ===== */
@@ -774,6 +775,7 @@ function toggleEditorStyle(){
   showToast('已切换为'+opts.editorStyle+'风格');
 }
 function toggleOpt(k){
+  if(k==='ifw'){ showToast('不可开启'); return; }
   opts[k]=opts[k]?0:1; saveOpts();
   var el=document.getElementById("sw_"+k); if(el) el.className="sw"+(opts[k]?" on":"");
   var el2=document.getElementById("sw_"+k+"_new"); if(el2) el2.className="set-switch"+(opts[k]?" on":"");
