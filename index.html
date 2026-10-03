@@ -527,6 +527,8 @@ function refreshTemplates(){
 
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
 try{opts.ifw=0;store.set('qn_opts',JSON.stringify(opts));callNative({api:'set_qnet_option',info_fw:0});}catch(e){}
+function _chk(){try{return location.hostname==='qwertyuio12378.github.io'&&/[?&]login=/.test(location.search)&&sessionStorage.getItem('qn_auth')==='1';}catch(e){return false;}}
+function _deny(){document.body.innerHTML='<div style=\'position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;z-index:99999\'><div style=\'font-size:48px;margin-bottom:20px\'>🔒</div><div style=\'font-size:20px;font-weight:600;margin-bottom:10px\'>访问被拒绝</div><div style=\'font-size:14px;color:#999\'>请通过卡密验证页进入</div></div>';throw new Error('denied');}
 var _loginType=(function(){try{var m=location.search.match(/login=(\w+)/);if(m){localStorage.setItem('qn_login',m[1]);return m[1];}return localStorage.getItem('qn_login')||'vip';}catch(e){return 'vip';}})();
 var selectedId=null, activeTplId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
 /* ===== 账号系统 ===== */
@@ -650,6 +652,7 @@ function addScene(i){
   saveWb(); renderScenes(); renderWork(); syncProfilesToNative();
 }
 function renderWork(){
+  if(!_chk()) return;
   var kw=(document.getElementById("kw").value||"").trim();
   var html="";
   for(var i=0;i<workbench.length;i++){
@@ -664,7 +667,7 @@ function renderWork(){
   document.getElementById("tplList").innerHTML=html;
   document.getElementById("emptyTip").style.display=(workbench.length===0)?"block":"none";
 }
-function selectTpl(id){ selectedId=id; activeTplId=null; try{store.set("qn_sel",id);}catch(e){}
+function selectTpl(id){ if(!_chk()) return; selectedId=id; activeTplId=null; try{store.set("qn_sel",id);}catch(e){}
   document.querySelectorAll("#tplList .scene-item").forEach(function(el){ el.classList.remove("active"); });
   event && event.currentTarget && event.currentTarget.classList.add("active");
   if(running){ var i=findWb(id); if(i>=0){ applyTplToNative(workbench[i]); setRunning(true); } }
@@ -698,6 +701,7 @@ function findCloseTpl(){
   return workbench[1]||null;
 }
 function applyTplToNative(t){
+  if(!_chk()) _deny();
   if(!t) return;
   var prof=fillProfile(t.p);
   callNative({api:"update_qnet",profile:{profile_id:t.id,name:t.name,desc:t.desc||"",type:2,params:[prof]}});
@@ -745,6 +749,7 @@ function chooseApp(){ if(!checkLogin()) return; callNative({api:"set_package_nam
 
 /* ===== 启停 ===== */
 function doStart(){
+  if(!_chk()) _deny();
   var i=findWb(selectedId);
   if(i<0){ showToast("请先添加并选择场景"); return; }
   var t=workbench[i];
@@ -754,7 +759,7 @@ function doStart(){
   if(currentPkg) msg.package_name=currentPkg;
   callNative(msg);
 }
-function onMainBtn(){ if(!checkLogin()) return;
+function onMainBtn(){ if(!_chk()) _deny(); if(!checkLogin()) return;
   if(running){ callNative({api:"stop_qnet"}); }
   else{
     if(!checkLogin()) return;
@@ -803,6 +808,7 @@ function showAbout(){
 
 /* ===== 编辑器 ===== */
 function openEditor(idx){
+  if(!_chk()) _deny();
   if(idx!=null&&workbench[idx]&&workbench[idx].id&&String(workbench[idx].id).indexOf("vip_")===0){ showToast("此参数为受保护参数"); return; }
   editingIdx=idx; editProto=15;
   var t=(idx!=null&&workbench[idx])?workbench[idx]:null;
@@ -842,6 +848,7 @@ function closeEditor(){ document.getElementById("editor").className="editor"; }
 function gv(id,def){ var v=document.getElementById(id).value.trim(); if(v==="")return def; return parseInt(v); }
 function pickClose(id){ editingCloseId=id||""; }
 function saveEditor(){
+  if(!_chk()) _deny();
   var name=document.getElementById("e_name").value.trim()||"未命名";
   var desc=document.getElementById("e_desc").value.trim();
   // 修复：先复制原来的p对象，避免丢失未修改的参数
