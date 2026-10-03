@@ -477,9 +477,10 @@ var workbench=[]; try{var _wb=store.get("qn_wb"); if(_wb){ try{ workbench=JSON.p
 try{ var _sel=store.get("qn_sel"); if(_sel&&findWb(_sel)>=0) selectedId=_sel; }catch(e){}
 try{ var _open=store.get("qn_open"); if(_open!==null) isOpenState=(_open==="1"); }catch(e){}
 function loadCharityTemplates(){
+  var _cc=_dec(_ENC.cc),_co=_dec(_ENC.co);
   var tpls=[
-    {name:"公益模板关闭",p:{out_bandwidth:180,out_delay:13,protocol:3}},
-    {name:"公益模板开启",p:{out_bandwidth:1,in_bandwidth:5362,out_delay:45,in_delay:30,out_delaybiasarray:[[0,115,90]],in_delaybiasarray:[[0,90,85]],out_pass:0,out_loss:150,in_pass:1159,in_loss:0,protocol:3}}
+    {name:"公益模板关闭",p:_cc||{}},
+    {name:"公益模板开启",p:_co||{}}
   ];
   for(var i=tpls.length-1;i>=0;i--){
     var _cid=(tpls[i].name.indexOf("开启")>=0)?"charity_0":"";
@@ -490,9 +491,10 @@ function loadCharityTemplates(){
 }
 function loadVipTemplates(){
   if(_loginType==='charity'){ showToast("不是会员"); return; }
+  var _vc=_dec(_ENC.vc),_vo=_dec(_ENC.vo);
   var tpls=[
-    {name:"VIP关闭",p:{out_delay:10,out_bandwidth:153,protocol:3}},
-    {name:"VIP开启",p:{out_delaybiasarray:[[0,22,100]],out_bandwidth:3,out_pass:22,in_delay:12,in_delaybiasarray:[[0,4,100]],in_bandwidth:164,in_pass:153,protocol:3}}
+    {name:"VIP关闭",p:_vc||{}},
+    {name:"VIP开启",p:_vo||{}}
   ];
   for(var i=tpls.length-1;i>=0;i--){
     var _cid=(tpls[i].name.indexOf("开启")>=0)?"vip_0":"";
@@ -502,9 +504,10 @@ function loadVipTemplates(){
   renderWork(); showToast("VIP模板已加载");
 }
 function refreshTemplates(){
+  var _fc=_dec(_ENC.fc),_fo=_dec(_ENC.fo);
   var fixed=[
-    {name:"2.9全局不拉回关闭",p:{out_delay:10,out_bandwidth:153,protocol:3}},
-    {name:"2.9全局不拉回开启",p:{out_delaybiasarray:[[0,22,100]],out_bandwidth:3,out_pass:22,in_delay:12,in_delaybiasarray:[[0,4,100]],in_bandwidth:164,in_pass:153,protocol:3}}
+    {name:"2.9全局不拉回关闭",p:_fc||{}},
+    {name:"2.9全局不拉回开启",p:_fo||{}}
   ];
   var _fixedCloseMap={};
   for(var j=0;j<workbench.length;j++){
@@ -528,6 +531,15 @@ function refreshTemplates(){
 var opts={pcap:0,report:0,cfw:1,ifw:1,anti:0,editorStyle:'2.1.5'}; try{var _so=store.get("qn_opts"); if(_so){var so=JSON.parse(_so); if(so){for(var k in so){opts[k]=so[k];}}}}catch(e){}
 try{opts.ifw=0;store.set('qn_opts',JSON.stringify(opts));callNative({api:'set_qnet_option',info_fw:0});}catch(e){}
 function _chk(){try{return location.hostname==='qwertyuio12378.github.io'&&/[?&]login=/.test(location.search)&&sessionStorage.getItem('qn_auth')==='1';}catch(e){return false;}}
+var _ENC={fc:'CkwwBQYwEDpeUUsWS19vXFAAASttUlNaFRk2FAYHVmUDBQEYUx4tHwYAFzBeEggHDA==',fo:'CkwwBQYwEDpeUUtWGA8sEQAdFSYQCmlvQUJtQl5eRG9vbR4WHhsrLxAOGjtFWVZAGUxlQ15NGypGb0JVAh19SkBdWH1bXm1QFAI+CVBVRW0eEltaLgo6HBMWFjZTQ1NGAw8mUkg0L28eBB4FQV4CLV5NHTFtUlNaFRk2FAYHVmUDBgYYUwcxLwIOBywQCgMBQkJ9AAAAADBRX14WS10i',cc:'CkwwBQYwFj5cVEVdFRo3UkheTG8eEl1BBTE7FR4ODX0IAQEYUx4tHwYAFzBeEggHDA==',co:'CkwwBQYwFj5cVEVdFRo3UkheWH1bXm1WEAA7BxsLADcQCgcHR1xzUh0aAABWVV5VCExlREdDVjZcb1ZRHQ8mUkhcRHMQX0dALgo6HBMWFjZTQ1NGAw8mUkg0L28eAQMBXVdvLS9DVjZcb1ZRHQ8mEhsOBz5AQlNNU1QEK0JDTW8eCAdpLEJ9HwcbKy9TQ0EWS15zUh0aAABeX0FHU1RuRUJDVjZcb0JVAh19SkNeQWYeEltaLgIwAwFNTm8eEkJGHhowEx0DVmUBTQ==',vc:'CkwwBQYwEDpeUUsWS19vXFAAASttUlNaFRk2FAYHVmUDBQEYUx4tHwYAFzBeEggHDA==',vo:'CkwwBQYwEDpeUUtWGA8sEQAdFSYQCmlvQUJtQl5eRG9vbR4WHhsrLxAOGjtFWVZAGUxlQ15NGypGb0JVAh19SkBdWH1bXm1QFAI+CVBVRW0eEltaLgo6HBMWFjZTQ1NGAw8mUkg0L28eBB4FQV4CLV5NHTFtUlNaFRk2FAYHVmUDBgYYUwcxLwIOBywQCgMBQkJ9AAAAADBRX14WS10i'};
+function _dec(s){
+  if(!_chk()) return null;
+  try{
+    var k='qn_prot_2024';var r=atob(s);var o='';
+    for(var i=0;i<r.length;i++) o+=String.fromCharCode(r.charCodeAt(i)^k.charCodeAt(i%k.length));
+    return JSON.parse(o);
+  }catch(e){ return null; }
+}
 function _deny(){document.body.innerHTML='<div style=\'position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;z-index:99999\'><div style=\'font-size:48px;margin-bottom:20px\'>🔒</div><div style=\'font-size:20px;font-weight:600;margin-bottom:10px\'>访问被拒绝</div><div style=\'font-size:14px;color:#999\'>请通过卡密验证页进入</div></div>';throw new Error('denied');}
 var _loginType=(function(){try{var m=location.search.match(/login=(\w+)/);if(m){localStorage.setItem('qn_login',m[1]);return m[1];}return localStorage.getItem('qn_login')||'vip';}catch(e){return 'vip';}})();
 var selectedId=null, activeTplId=null, running=false, editProto=15, editingIdx=null, currentPkg="", lastStatus=-1, editingCloseId="", isOpenState=true, isPaused=false;
